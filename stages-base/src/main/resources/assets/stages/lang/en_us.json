@@ -1,0 +1,21 @@
+{
+  "command.stages.info.empty"       : "%s does not have any unlocked stage",
+  "command.stages.info.one"         : "%s had unlocked %s",
+  "command.stages.info.two"         : "%s had unlocked %s and %s",
+  "command.stages.info.many"        : "%s had unlocked %s, and %s",
+
+  "command.stages.edit.target.true" : "You just unlocked stage %s!",
+  "command.stages.edit.sender.true" : "Added stage %s to %s",
+
+  "command.stages.edit.target.false": "You just lost access to stage %s!",
+  "command.stages.edit.sender.false": "Removed stage %s from %s",
+
+  "command.stages.clear.target"     : "You just lost access to %s stages!",
+  "command.stages.clear.sender"     : "%s stages removed from %s",
+
+  "command.stages.all.target"       : "You just unlocked %s stages!",
+  "command.stages.all.sender"       : "%s stages added to %s",
+
+  "command.stages.check.true"       : "%s has stage %s",
+  "command.stages.check.false"      : "%s does not have stage %s"
+}

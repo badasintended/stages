@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id"           : "stages-base",
+  "version"      : "${version}",
+  "authors"      : ["deirn"],
+  "contact"      : {
+    "homepage": "https://github.com/badasintended/stages",
+    "sources" : "https://github.com/badasintended/stages",
+    "issues"  : "https://github.com/badasintended/stages/issues"
+  },
+  "license"      : "MIT",
+  "icon"         : "assets/stages/icon.png",
+  "environment"  : "*",
+  "entrypoints"  : {
+    "main"  : ["badasintended.stages.impl.StagesMod"],
+    "client": ["badasintended.stages.impl.StagesModClient"]
+  },
+  "mixins"       : ["stages.mixins.json"],
+  "depends"      : {
+    "fabricloader": ">=0.7.4",
+    "fabric"      : "*",
+    "minecraft"   : "*"
+  },
+  "custom": {
+    "modmenu:api": true
+  }
+}
