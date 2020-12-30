@@ -2,8 +2,8 @@ package badasintended.stages.impl.mixin;
 
 import java.util.Collection;
 
-import badasintended.stages.impl.StagesMod;
 import badasintended.stages.api.data.Stages;
+import badasintended.stages.impl.StagesMod;
 import badasintended.stages.impl.data.StageHolder;
 import badasintended.stages.impl.data.StagesImpl;
 import io.netty.buffer.Unpooled;
