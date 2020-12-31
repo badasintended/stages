@@ -12,7 +12,8 @@
   "icon"         : "assets/stages/icon.png",
   "environment"  : "*",
   "entrypoints"  : {
-    "stages:main": ["badasintended.stages.impl.item.ItemStages"]
+    "stages:main"  : ["badasintended.stages.impl.item.ItemStages"],
+    "stages:client": ["badasintended.stages.impl.item.ItemStagesClient"]
   },
   "mixins"       : ["stages-item.mixins.json"],
   "depends"      : {

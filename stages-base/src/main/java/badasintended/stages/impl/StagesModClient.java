@@ -1,6 +1,6 @@
 package badasintended.stages.impl;
 
-import badasintended.stages.api.StageConstants;
+import badasintended.stages.api.StagesUtil;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageSyncEvents;
 import badasintended.stages.api.init.ClientStagesInit;
@@ -49,7 +49,7 @@ public class StagesModClient implements ClientModInitializer {
         });
 
         StagesMod.LOGGER.info("[stages] Loading ClientStagesInit");
-        FabricLoader.getInstance().getEntrypointContainers(StageConstants.MOD_ID + ":client", ClientStagesInit.class).forEach(container -> {
+        FabricLoader.getInstance().getEntrypointContainers(StagesUtil.MOD_ID + ":client", ClientStagesInit.class).forEach(container -> {
             ClientStagesInit init = container.getEntrypoint();
             init.onStagesClientInit();
             StagesMod.LOGGER.info("[stages] |=> loaded {} from {}", init.getClass().getName(), container.getProvider().getMetadata().getId());

@@ -1,6 +1,6 @@
 package badasintended.stages.impl.test;
 
-import badasintended.stages.api.StageConstants;
+import badasintended.stages.api.StagesUtil;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
@@ -21,7 +21,7 @@ public class StagesTest implements StagesInit {
         E = id("e");
 
     public static Identifier id(String path) {
-        return new Identifier(StageConstants.MOD_ID, "test/" + path);
+        return new Identifier(StagesUtil.MOD_ID, "test/" + path);
     }
 
     @Override

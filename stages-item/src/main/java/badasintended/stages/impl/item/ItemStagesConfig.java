@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-import badasintended.stages.api.StageConstants;
+import badasintended.stages.api.StagesUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -31,7 +31,7 @@ import net.minecraft.util.registry.Registry;
 
 public class ItemStagesConfig {
 
-    private static final Path CONFIG_PATH = StageConstants.CONFIG_PATH.resolve("items.json");
+    private static final Path CONFIG_PATH = StagesUtil.CONFIG_PATH.resolve("items.json");
 
     public static final Gson GSON = new GsonBuilder()
         .setPrettyPrinting()

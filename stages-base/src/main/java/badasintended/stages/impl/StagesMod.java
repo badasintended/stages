@@ -1,6 +1,6 @@
 package badasintended.stages.impl;
 
-import badasintended.stages.api.StageConstants;
+import badasintended.stages.api.StagesUtil;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.init.StagesInit;
 import badasintended.stages.impl.command.StagesCommand;
@@ -15,18 +15,14 @@ import org.apache.logging.log4j.Logger;
 
 public class StagesMod implements ModInitializer {
 
-    public static final Logger LOGGER = LogManager.getLogger(StageConstants.MOD_ID);
+    public static final Logger LOGGER = LogManager.getLogger(StagesUtil.MOD_ID);
 
     // @formatter:off
     public static final Identifier
-        SYNC_REGISTRY = id("sync_registry"),
-        SYNC_STAGES   = id("sync_stages"),
-        REQUEST_SYNC  = id("request_sync_stages");
+        SYNC_REGISTRY = StagesUtil.id("sync_registry"),
+        SYNC_STAGES   = StagesUtil.id("sync_stages"),
+        REQUEST_SYNC  = StagesUtil.id("request_sync_stages");
     // @formatter:on
-
-    public static Identifier id(String path) {
-        return new Identifier(StageConstants.MOD_ID, path);
-    }
 
     @Override
     public void onInitialize() {
@@ -43,7 +39,7 @@ public class StagesMod implements ModInitializer {
         });
 
         LOGGER.info("[stages] Loading StagesInit");
-        FabricLoader.getInstance().getEntrypointContainers(StageConstants.MOD_ID + ":main", StagesInit.class).forEach(container -> {
+        FabricLoader.getInstance().getEntrypointContainers(StagesUtil.MOD_ID + ":main", StagesInit.class).forEach(container -> {
             StagesInit init = container.getEntrypoint();
             init.onStagesInit();
             LOGGER.info("[stages] |=> loaded {} from {}", init.getClass().getName(), container.getProvider().getMetadata().getId());
