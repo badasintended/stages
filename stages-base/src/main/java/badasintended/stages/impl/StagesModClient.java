@@ -1,6 +1,9 @@
 package badasintended.stages.impl;
 
+import java.nio.charset.StandardCharsets;
+
 import badasintended.stages.api.StagesUtil;
+import badasintended.stages.api.config.Config;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageSyncEvents;
 import badasintended.stages.api.init.ClientStagesInit;
@@ -18,6 +21,13 @@ public class StagesModClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ClientPlayNetworking.registerGlobalReceiver(StagesMod.SYNC_CONFIG, (client, handler, buf, sender) -> {
+            String name = buf.readString();
+            String json = new String(buf.readByteArray(), StandardCharsets.UTF_8);
+
+            client.execute(() -> Config.CONFIGS.get(name).fromJson(json));
+        });
+
         ClientPlayNetworking.registerGlobalReceiver(StagesMod.SYNC_REGISTRY, (client, handler, buf, sender) -> {
             int size = buf.readVarInt();
             Identifier[] stages = new Identifier[size];

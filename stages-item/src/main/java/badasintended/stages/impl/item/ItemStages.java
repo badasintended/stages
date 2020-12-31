@@ -4,13 +4,13 @@ import java.util.Map;
 import java.util.Set;
 
 import badasintended.stages.api.StagesUtil;
+import badasintended.stages.api.config.Config;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -28,8 +28,13 @@ public class ItemStages implements StagesInit {
     public static final Item UNKNOWN_ITEM = new Item(new Item.Settings());
 
     public static final Identifier
-        SYNC_LOCKED_ITEM = StagesUtil.id("item/sync_locked_item"),
-        SYNC_SETTINGS = StagesUtil.id("item/sync_settings");
+        SYNC_LOCKED_ITEM = StagesUtil.id("item/sync_locked_item");
+
+    public static final Config<ItemStagesConfig> CONFIG = Config.create(
+        ItemStagesConfig.class, "item", true, gson -> gson
+            .registerTypeAdapter(Identifier.class, new ItemStagesConfig.IdSerializer())
+            .registerTypeAdapter(ItemStagesConfig.Entry.class, new ItemStagesConfig.Entry.Serializer())
+    );
 
     public static final CompoundTag EMPTY_TAG = new CompoundTag();
 
@@ -48,7 +53,7 @@ public class ItemStages implements StagesInit {
 
     public static void editLockedItems(Stages stages, Identifier stage) {
         boolean unlock = stages.contains(stage);
-        Map<Identifier, ItemStagesConfig.Entry> entries = ItemStagesConfig.get().entries;
+        Map<Identifier, ItemStagesConfig.Entry> entries = CONFIG.get().entries;
         if (entries.containsKey(stage)) {
             PlayerEntity player = stages.getPlayer();
             ItemStagesConfig.Entry entry = entries.get(stage);
@@ -91,35 +96,15 @@ public class ItemStages implements StagesInit {
         Registry.register(Registry.ITEM, new Identifier("itemstages:unknown"), UNKNOWN_ITEM);
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-            ItemStagesConfig.destroy();
-            ItemStagesConfig.get().entries.forEach((id, entry) -> {
+            CONFIG.get().entries.forEach((id, entry) -> {
                 Stages.register(id);
-            });
-        });
-
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-            ItemStagesConfig.Settings settings = ItemStagesConfig.get().settings;
-            buf.writeBoolean(settings.isDropWhenOnHand());
-            buf.writeBoolean(settings.isDropWhenOnCursor());
-            buf.writeBoolean(settings.isDropWhenPicked());
-            buf.writeBoolean(settings.isChangeModel());
-            buf.writeBoolean(settings.isHideTooltip());
-            buf.writeBoolean(settings.isPreventToInventory());
-            buf.writeBoolean(settings.isHideFromRei());
-            handler.sendPacket(sender.createPacket(SYNC_SETTINGS, buf));
-
-            Map<Identifier, ItemStagesConfig.Entry> entries = ItemStagesConfig.get().entries;
-            Stages stages = Stages.get(handler.player);
-            entries.forEach((id, entry) -> {
-                editLockedItems(stages, id);
             });
         });
 
         StageEvents.ADDED.register(ItemStages::editLockedItems);
         StageEvents.REMOVED.register(ItemStages::editLockedItems);
         StageEvents.CLEARED.register(stages -> {
-            Map<Identifier, ItemStagesConfig.Entry> entries = ItemStagesConfig.get().entries;
+            Map<Identifier, ItemStagesConfig.Entry> entries = CONFIG.get().entries;
             entries.forEach((id, entry) -> {
                 editLockedItems(stages, id);
             });

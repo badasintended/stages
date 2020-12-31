@@ -1,7 +1,6 @@
 package badasintended.stages.impl.item.mixin.rei;
 
 import badasintended.stages.impl.item.ItemStages;
-import badasintended.stages.impl.item.ItemStagesConfig;
 import me.shedaniel.rei.api.EntryStack;
 import me.shedaniel.rei.gui.widget.EntryListWidget;
 import me.shedaniel.rei.gui.widget.WidgetWithBounds;
@@ -16,7 +15,7 @@ public abstract class EntryListWidgetMixin extends WidgetWithBounds {
     @Inject(method = "canLastSearchTermsBeAppliedTo", at = @At("HEAD"), cancellable = true)
     private void hideLockedStack(EntryStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (
-            ItemStagesConfig.get().settings.isHideFromRei()
+            ItemStages.CONFIG.get().settings.hideFromRei
                 && stack.getType() == EntryStack.Type.ITEM
                 && ItemStages.isLocked(minecraft.player, stack.getItemStack())
         ) {

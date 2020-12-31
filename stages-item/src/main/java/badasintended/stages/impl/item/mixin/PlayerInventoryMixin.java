@@ -1,7 +1,6 @@
 package badasintended.stages.impl.item.mixin;
 
 import badasintended.stages.impl.item.ItemStages;
-import badasintended.stages.impl.item.ItemStagesConfig;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -25,7 +24,7 @@ public abstract class PlayerInventoryMixin {
 
     @Inject(method = "setCursorStack", at = @At("HEAD"), cancellable = true)
     private void dropLockedItem(ItemStack stack, CallbackInfo ci) {
-        if (ItemStages.isLocked(player, stack)) {
+        if (ItemStages.CONFIG.get().settings.dropWhenOnCursor && ItemStages.isLocked(player, stack)) {
             player.dropItem(stack, false, true);
             cursorStack = ItemStack.EMPTY;
             ci.cancel();
@@ -34,7 +33,7 @@ public abstract class PlayerInventoryMixin {
 
     @Inject(method = "insertStack(ILnet/minecraft/item/ItemStack;)Z", at = @At("HEAD"), cancellable = true)
     private void preventLockedItem(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if (ItemStagesConfig.get().settings.isPreventToInventory() && ItemStages.isLocked(player, stack)) {
+        if (ItemStages.CONFIG.get().settings.preventToInventory && ItemStages.isLocked(player, stack)) {
             cir.setReturnValue(false);
         }
     }

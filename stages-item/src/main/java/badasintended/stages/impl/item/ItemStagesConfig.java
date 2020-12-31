@@ -1,15 +1,9 @@
 package badasintended.stages.impl.item;
 
 
-import java.io.IOException;
 import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 
-import badasintended.stages.api.StagesUtil;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -31,94 +25,20 @@ import net.minecraft.util.registry.Registry;
 
 public class ItemStagesConfig {
 
-    private static final Path CONFIG_PATH = StagesUtil.CONFIG_PATH.resolve("items.json");
-
-    public static final Gson GSON = new GsonBuilder()
-        .setPrettyPrinting()
-        .registerTypeAdapter(Identifier.class, new IdSerializer())
-        .registerTypeAdapter(Entry.class, new Entry.Serializer())
-        .create();
-
-    private static ItemStagesConfig config = null;
-
-    public static ItemStagesConfig get() {
-        if (config == null) {
-            try {
-                if (Files.notExists(CONFIG_PATH)) {
-                    config = new ItemStagesConfig();
-                    Files.write(CONFIG_PATH, GSON.toJson(config).getBytes());
-                } else {
-                    config = GSON.fromJson(String.join("\n", Files.readAllLines(CONFIG_PATH)), ItemStagesConfig.class);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return config;
-    }
-
-    public static void destroy() {
-        config = null;
-    }
-
     public final Settings settings = new Settings();
     public final Map<Identifier, Entry> entries = new Object2ObjectOpenHashMap<>();
 
     public static class Settings {
 
-        private boolean dropWhenOnHand = true;
-        private boolean dropWhenOnCursor = true;
-        private boolean dropWhenPicked = true;
-        private boolean changeModel = true;
-        private boolean hideTooltip = true;
-        private boolean preventToInventory = true;
-        private boolean hideFromRei = true;
-
-        public boolean isDropWhenOnHand() {
-            return dropWhenOnHand;
-        }
-
-        public boolean isDropWhenOnCursor() {
-            return dropWhenOnCursor;
-        }
-
-        public boolean isDropWhenPicked() {
-            return dropWhenPicked;
-        }
-
-        public boolean isChangeModel() {
-            return changeModel;
-        }
-
-        public boolean isHideTooltip() {
-            return hideTooltip;
-        }
-
-        public boolean isPreventToInventory() {
-            return preventToInventory;
-        }
-
-        public boolean isHideFromRei() {
-            return hideFromRei;
-        }
-
-        public void setAll(
-            boolean dropWhenOnHand,
-            boolean dropWhenOnCursor,
-            boolean dropWhenPicked,
-            boolean changeModel,
-            boolean hideTooltip,
-            boolean preventToInventory,
-            boolean hideFromRei
-        ) {
-            this.dropWhenOnHand = dropWhenOnHand;
-            this.dropWhenOnCursor = dropWhenOnCursor;
-            this.dropWhenPicked = dropWhenPicked;
-            this.changeModel = changeModel;
-            this.hideTooltip = hideTooltip;
-            this.preventToInventory = preventToInventory;
-            this.hideFromRei = hideFromRei;
-        }
+        // @formatter:off
+        public final boolean
+            dropWhenOnHand     = true,
+            dropWhenOnCursor   = true,
+            changeModel        = true,
+            hideTooltip        = true,
+            preventToInventory = true,
+            hideFromRei        = true;
+        // @formatter:on
 
     }
 

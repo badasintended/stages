@@ -22,26 +22,6 @@ public class ItemStagesClient implements ClientStagesInit {
                 ItemStages.editLockedItem(client.player, item, nbt, unlock);
             });
         });
-
-        ClientPlayNetworking.registerGlobalReceiver(ItemStages.SYNC_SETTINGS, (client, handler, buf, responseSender) -> {
-            boolean dropWhenOnHand = buf.readBoolean();
-            boolean dropWhenOnCursor = buf.readBoolean();
-            boolean dropWhenPicked = buf.readBoolean();
-            boolean changeModel = buf.readBoolean();
-            boolean hideTooltip = buf.readBoolean();
-            boolean preventToInventory = buf.readBoolean();
-            boolean hideFromRei = buf.readBoolean();
-
-            client.execute(() -> ItemStagesConfig.get().settings.setAll(
-                dropWhenOnHand,
-                dropWhenOnCursor,
-                dropWhenPicked,
-                changeModel,
-                hideTooltip,
-                preventToInventory,
-                hideFromRei
-            ));
-        });
     }
 
 }
