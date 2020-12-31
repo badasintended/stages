@@ -30,6 +30,7 @@ public class ItemStagesClient implements ClientStagesInit {
             boolean changeModel = buf.readBoolean();
             boolean hideTooltip = buf.readBoolean();
             boolean preventToInventory = buf.readBoolean();
+            boolean hideFromRei = buf.readBoolean();
 
             client.execute(() -> ItemStagesConfig.get().settings.setAll(
                 dropWhenOnHand,
@@ -37,7 +38,8 @@ public class ItemStagesClient implements ClientStagesInit {
                 dropWhenPicked,
                 changeModel,
                 hideTooltip,
-                preventToInventory
+                preventToInventory,
+                hideFromRei
             ));
         });
     }

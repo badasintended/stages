@@ -25,7 +25,7 @@ public abstract class ItemModelsMixin {
     @Inject(method = "getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;", at = @At("HEAD"), cancellable = true)
     private void replaceLockedItemModel(ItemStack stack, CallbackInfoReturnable<BakedModel> cir) {
         PlayerEntity player = MinecraftClient.getInstance().player;
-        if (ItemStagesConfig.get().settings.isChangeModel() && player != null && ItemStages.isLocked(player, stack)) {
+        if (ItemStagesConfig.get().settings.isChangeModel() && ItemStages.isLocked(player, stack)) {
             cir.setReturnValue(getModel(ItemStages.UNKNOWN_ITEM));
         }
     }

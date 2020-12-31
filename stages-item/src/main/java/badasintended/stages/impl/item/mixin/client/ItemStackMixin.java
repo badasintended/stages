@@ -31,7 +31,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getTooltip", at = @At("HEAD"), cancellable = true)
     private void hideLockedTooltip(@Nullable PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> cir) {
-        if (ItemStagesConfig.get().settings.isHideTooltip() && player != null && ItemStages.isLocked(player, (ItemStack) (Object) this)) {
+        if (ItemStagesConfig.get().settings.isHideTooltip() && ItemStages.isLocked(player, (ItemStack) (Object) this)) {
             cir.setReturnValue(LOCKED_ITEM);
         }
     }

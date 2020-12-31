@@ -72,6 +72,7 @@ public class ItemStagesConfig {
         private boolean changeModel = true;
         private boolean hideTooltip = true;
         private boolean preventToInventory = true;
+        private boolean hideFromRei = true;
 
         public boolean isDropWhenOnHand() {
             return dropWhenOnHand;
@@ -97,19 +98,26 @@ public class ItemStagesConfig {
             return preventToInventory;
         }
 
+        public boolean isHideFromRei() {
+            return hideFromRei;
+        }
+
         public void setAll(
             boolean dropWhenOnHand,
             boolean dropWhenOnCursor,
             boolean dropWhenPicked,
             boolean changeModel,
             boolean hideTooltip,
-            boolean preventToInventory) {
+            boolean preventToInventory,
+            boolean hideFromRei
+        ) {
             this.dropWhenOnHand = dropWhenOnHand;
             this.dropWhenOnCursor = dropWhenOnCursor;
             this.dropWhenPicked = dropWhenPicked;
             this.changeModel = changeModel;
             this.hideTooltip = hideTooltip;
             this.preventToInventory = preventToInventory;
+            this.hideFromRei = hideFromRei;
         }
 
     }

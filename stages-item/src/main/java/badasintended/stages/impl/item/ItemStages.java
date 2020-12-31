@@ -21,6 +21,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemStages implements StagesInit {
 
@@ -32,8 +33,8 @@ public class ItemStages implements StagesInit {
 
     public static final CompoundTag EMPTY_TAG = new CompoundTag();
 
-    public static boolean isLocked(PlayerEntity player, ItemStack stack) {
-        if (!stack.isEmpty() && !player.isCreative()) {
+    public static boolean isLocked(@Nullable PlayerEntity player, ItemStack stack) {
+        if (!stack.isEmpty() && player != null && !player.isCreative()) {
             Map<Item, Set<CompoundTag>> locked = ((ItemStageHolder) player).stages$getLockedItems();
             Item item = stack.getItem();
             if (locked.containsKey(item)) {
@@ -50,7 +51,6 @@ public class ItemStages implements StagesInit {
         Map<Identifier, ItemStagesConfig.Entry> entries = ItemStagesConfig.get().entries;
         if (entries.containsKey(stage)) {
             PlayerEntity player = stages.getPlayer();
-            Map<Item, Set<CompoundTag>> locked = ((ItemStageHolder) stages.getPlayer()).stages$getLockedItems();
             ItemStagesConfig.Entry entry = entries.get(stage);
 
             if (entry.tag != null) {
@@ -106,6 +106,7 @@ public class ItemStages implements StagesInit {
             buf.writeBoolean(settings.isChangeModel());
             buf.writeBoolean(settings.isHideTooltip());
             buf.writeBoolean(settings.isPreventToInventory());
+            buf.writeBoolean(settings.isHideFromRei());
             handler.sendPacket(sender.createPacket(SYNC_SETTINGS, buf));
 
             Map<Identifier, ItemStagesConfig.Entry> entries = ItemStagesConfig.get().entries;

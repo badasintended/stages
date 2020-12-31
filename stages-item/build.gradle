@@ -1,3 +1,9 @@
+repositories {
+    jcenter()
+}
+
 dependencies {
     implementation(project(":stages-base"))
+
+    modImplementation "me.shedaniel:RoughlyEnoughItems:${rootProject.rei}"
 }
