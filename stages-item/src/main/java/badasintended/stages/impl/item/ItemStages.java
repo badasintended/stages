@@ -88,7 +88,7 @@ public class ItemStages implements StagesInit {
 
     @Override
     public void onStagesInit() {
-        Registry.register(Registry.ITEM, new Identifier("stages-item:unknown"), UNKNOWN_ITEM);
+        Registry.register(Registry.ITEM, new Identifier("itemstages:unknown"), UNKNOWN_ITEM);
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             ItemStagesConfig.destroy();

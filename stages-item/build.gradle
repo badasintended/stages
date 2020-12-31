@@ -3,7 +3,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":stages-base"))
+    implementation project(":stages-base")
 
     modImplementation "me.shedaniel:RoughlyEnoughItems:${rootProject.rei}"
 }

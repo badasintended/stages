@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id"           : "stages-item",
+  "id"           : "itemstages",
   "version"      : "${version}",
   "authors"      : ["deirn"],
   "contact"      : {
@@ -9,7 +9,7 @@
     "issues"  : "https://github.com/badasintended/stages/issues"
   },
   "license"      : "LGPL-2.1",
-  "icon"         : "assets/stages-item/icon.png",
+  "icon"         : "assets/itemstages/icon.png",
   "environment"  : "*",
   "entrypoints"  : {
     "stages:main"  : ["badasintended.stages.impl.item.ItemStages"],
