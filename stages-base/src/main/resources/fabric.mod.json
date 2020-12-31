@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id"           : "stages-base",
+  "id"           : "stages",
   "version"      : "${version}",
   "authors"      : ["deirn"],
   "contact"      : {
