@@ -1,4 +1,4 @@
-package badasintended.stages.test;
+package badasintended.stages.impl.test;
 
 import badasintended.stages.api.event.StageSyncEvents;
 import badasintended.stages.api.init.ClientStagesInit;

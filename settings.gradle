@@ -10,3 +10,6 @@ pluginManagement {
 }
 
 include 'stages-base'
+include 'stages-item'
+include 'stages-test'
+

@@ -1,5 +1,6 @@
 package badasintended.stages.impl;
 
+import badasintended.stages.api.StageConstants;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.init.StagesInit;
 import badasintended.stages.impl.command.StagesCommand;
@@ -14,8 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 public class StagesMod implements ModInitializer {
 
-    public static final String MOD_ID = "stages";
-    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+    public static final Logger LOGGER = LogManager.getLogger(StageConstants.MOD_ID);
 
     // @formatter:off
     public static final Identifier
@@ -25,7 +25,7 @@ public class StagesMod implements ModInitializer {
     // @formatter:on
 
     public static Identifier id(String path) {
-        return new Identifier(MOD_ID, path);
+        return new Identifier(StageConstants.MOD_ID, path);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class StagesMod implements ModInitializer {
         });
 
         LOGGER.info("[stages] Loading StagesInit");
-        FabricLoader.getInstance().getEntrypointContainers(MOD_ID + ":main", StagesInit.class).forEach(container -> {
+        FabricLoader.getInstance().getEntrypointContainers(StageConstants.MOD_ID + ":main", StagesInit.class).forEach(container -> {
             StagesInit init = container.getEntrypoint();
             init.onStagesInit();
             LOGGER.info("[stages] |=> loaded {} from {}", init.getClass().getName(), container.getProvider().getMetadata().getId());

@@ -34,3 +34,7 @@ jobs:
         with:
           name: base ${{ steps.vars.outputs.VERSION }}
           path: "./stages-base/build/libs/**.jar"
+      - uses: actions/upload-artifact@v2
+        with:
+          name: item ${{ steps.vars.outputs.VERSION }}
+          path: "./stages-item/build/libs/**.jar"

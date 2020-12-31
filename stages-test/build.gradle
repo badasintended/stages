@@ -1,0 +1,7 @@
+dependencies {
+    afterEvaluate {
+        rootProject.subprojects.each {
+            if (it.name != name) implementation it
+        }
+    }
+}

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id"           : "stages-base",
+  "id"           : "stages-item",
   "version"      : "${version}",
   "authors"      : ["deirn"],
   "contact"      : {
@@ -12,16 +12,16 @@
   "icon"         : "assets/stages/icon.png",
   "environment"  : "*",
   "entrypoints"  : {
-    "main"  : ["badasintended.stages.impl.StagesMod"],
-    "client": ["badasintended.stages.impl.StagesModClient"]
+    "stages:main": ["badasintended.stages.impl.item.ItemStages"]
   },
-  "mixins"       : ["stages.mixins.json"],
+  "mixins"       : ["stages-item.mixins.json"],
   "depends"      : {
     "fabricloader": ">=0.7.4",
     "fabric"      : "*",
-    "minecraft"   : "*"
+    "minecraft"   : "*",
+    "stages-base" : "*"
   },
-  "custom": {
+  "custom"       : {
     "modmenu:api": true
   }
 }
