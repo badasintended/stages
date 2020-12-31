@@ -61,7 +61,58 @@ public class ItemStagesConfig {
         config = null;
     }
 
+    public final Settings settings = new Settings();
     public final Map<Identifier, Entry> entries = new Object2ObjectOpenHashMap<>();
+
+    public static class Settings {
+
+        private boolean dropWhenOnHand = true;
+        private boolean dropWhenOnCursor = true;
+        private boolean dropWhenPicked = true;
+        private boolean changeModel = true;
+        private boolean hideTooltip = true;
+        private boolean preventToInventory = true;
+
+        public boolean isDropWhenOnHand() {
+            return dropWhenOnHand;
+        }
+
+        public boolean isDropWhenOnCursor() {
+            return dropWhenOnCursor;
+        }
+
+        public boolean isDropWhenPicked() {
+            return dropWhenPicked;
+        }
+
+        public boolean isChangeModel() {
+            return changeModel;
+        }
+
+        public boolean isHideTooltip() {
+            return hideTooltip;
+        }
+
+        public boolean isPreventToInventory() {
+            return preventToInventory;
+        }
+
+        public void setAll(
+            boolean dropWhenOnHand,
+            boolean dropWhenOnCursor,
+            boolean dropWhenPicked,
+            boolean changeModel,
+            boolean hideTooltip,
+            boolean preventToInventory) {
+            this.dropWhenOnHand = dropWhenOnHand;
+            this.dropWhenOnCursor = dropWhenOnCursor;
+            this.dropWhenPicked = dropWhenPicked;
+            this.changeModel = changeModel;
+            this.hideTooltip = hideTooltip;
+            this.preventToInventory = preventToInventory;
+        }
+
+    }
 
     public static class Entry {
 

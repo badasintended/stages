@@ -1,6 +1,7 @@
 package badasintended.stages.impl.item.mixin;
 
 import badasintended.stages.impl.item.ItemStages;
+import badasintended.stages.impl.item.ItemStagesConfig;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -33,7 +34,7 @@ public abstract class PlayerInventoryMixin {
 
     @Inject(method = "insertStack(ILnet/minecraft/item/ItemStack;)Z", at = @At("HEAD"), cancellable = true)
     private void preventLockedItem(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if (ItemStages.isLocked(player, stack)) {
+        if (ItemStagesConfig.get().settings.isPreventToInventory() && ItemStages.isLocked(player, stack)) {
             cir.setReturnValue(false);
         }
     }

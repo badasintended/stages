@@ -1,6 +1,7 @@
 package badasintended.stages.impl.item.mixin.client;
 
 import badasintended.stages.impl.item.ItemStages;
+import badasintended.stages.impl.item.ItemStagesConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.item.ItemModels;
 import net.minecraft.client.render.model.BakedModel;
@@ -24,7 +25,7 @@ public abstract class ItemModelsMixin {
     @Inject(method = "getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;", at = @At("HEAD"), cancellable = true)
     private void replaceLockedItemModel(ItemStack stack, CallbackInfoReturnable<BakedModel> cir) {
         PlayerEntity player = MinecraftClient.getInstance().player;
-        if (player != null && ItemStages.isLocked(player, stack)) {
+        if (ItemStagesConfig.get().settings.isChangeModel() && player != null && ItemStages.isLocked(player, stack)) {
             cir.setReturnValue(getModel(ItemStages.UNKNOWN_ITEM));
         }
     }

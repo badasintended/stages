@@ -26,7 +26,9 @@ public class ItemStages implements StagesInit {
 
     public static final Item UNKNOWN_ITEM = new Item(new Item.Settings());
 
-    public static final Identifier SYNC = StagesUtil.id("item/sync");
+    public static final Identifier
+        SYNC_LOCKED_ITEM = StagesUtil.id("item/sync_locked_item"),
+        SYNC_SETTINGS = StagesUtil.id("item/sync_settings");
 
     public static final CompoundTag EMPTY_TAG = new CompoundTag();
 
@@ -79,7 +81,7 @@ public class ItemStages implements StagesInit {
                 buf.writeVarInt(Registry.ITEM.getRawId(item));
                 buf.writeCompoundTag(nbt);
                 buf.writeBoolean(unlock);
-                ServerPlayNetworking.send((ServerPlayerEntity) player, SYNC, buf);
+                ServerPlayNetworking.send((ServerPlayerEntity) player, SYNC_LOCKED_ITEM, buf);
             }
         }
     }
@@ -96,6 +98,16 @@ public class ItemStages implements StagesInit {
         });
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+            ItemStagesConfig.Settings settings = ItemStagesConfig.get().settings;
+            buf.writeBoolean(settings.isDropWhenOnHand());
+            buf.writeBoolean(settings.isDropWhenOnCursor());
+            buf.writeBoolean(settings.isDropWhenPicked());
+            buf.writeBoolean(settings.isChangeModel());
+            buf.writeBoolean(settings.isHideTooltip());
+            buf.writeBoolean(settings.isPreventToInventory());
+            handler.sendPacket(sender.createPacket(SYNC_SETTINGS, buf));
+
             Map<Identifier, ItemStagesConfig.Entry> entries = ItemStagesConfig.get().entries;
             Stages stages = Stages.get(handler.player);
             entries.forEach((id, entry) -> {

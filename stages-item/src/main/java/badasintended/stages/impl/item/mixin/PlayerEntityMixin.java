@@ -5,6 +5,7 @@ import java.util.Set;
 
 import badasintended.stages.impl.item.ItemStageHolder;
 import badasintended.stages.impl.item.ItemStages;
+import badasintended.stages.impl.item.ItemStagesConfig;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -36,7 +37,7 @@ public abstract class PlayerEntityMixin implements ItemStageHolder {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void dropLockedItem(CallbackInfo ci) {
-        if (ItemStages.isLocked((PlayerEntity) (Object) this, selectedItem)) {
+        if (ItemStagesConfig.get().settings.isDropWhenOnHand() && ItemStages.isLocked((PlayerEntity) (Object) this, selectedItem)) {
             dropSelectedItem(true);
         }
     }

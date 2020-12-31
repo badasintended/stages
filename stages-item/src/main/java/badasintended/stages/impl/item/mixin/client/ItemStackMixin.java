@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import badasintended.stages.impl.item.ItemStages;
+import badasintended.stages.impl.item.ItemStagesConfig;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -30,7 +31,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getTooltip", at = @At("HEAD"), cancellable = true)
     private void hideLockedTooltip(@Nullable PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> cir) {
-        if (player != null && ItemStages.isLocked(player, (ItemStack) (Object) this)) {
+        if (ItemStagesConfig.get().settings.isHideTooltip() && player != null && ItemStages.isLocked(player, (ItemStack) (Object) this)) {
             cir.setReturnValue(LOCKED_ITEM);
         }
     }
