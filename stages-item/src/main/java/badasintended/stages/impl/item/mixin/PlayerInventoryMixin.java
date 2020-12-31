@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerInventory.class)
 public abstract class PlayerInventoryMixin {
@@ -27,6 +28,13 @@ public abstract class PlayerInventoryMixin {
             player.dropItem(stack, false, true);
             cursorStack = ItemStack.EMPTY;
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "insertStack(ILnet/minecraft/item/ItemStack;)Z", at = @At("HEAD"), cancellable = true)
+    private void preventLockedItem(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+        if (ItemStages.isLocked(player, stack)) {
+            cir.setReturnValue(false);
         }
     }
 
