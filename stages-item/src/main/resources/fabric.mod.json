@@ -9,7 +9,7 @@
     "issues"  : "https://github.com/badasintended/stages/issues"
   },
   "license"      : "LGPL-2.1",
-  "icon"         : "assets/stages/icon.png",
+  "icon"         : "assets/stages-item/icon.png",
   "environment"  : "*",
   "entrypoints"  : {
     "stages:main"  : ["badasintended.stages.impl.item.ItemStages"],
@@ -20,7 +20,7 @@
     "fabricloader": ">=0.7.4",
     "fabric"      : "*",
     "minecraft"   : "*",
-    "stages-base" : "*"
+    "stages"      : "*"
   },
   "custom"       : {
     "modmenu:api": true

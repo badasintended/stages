@@ -24,6 +24,8 @@ import net.minecraft.util.registry.Registry;
 
 public class ItemStages implements StagesInit {
 
+    public static final Item UNKNOWN_ITEM = new Item(new Item.Settings());
+
     public static final Identifier SYNC = StagesUtil.id("item/sync");
 
     public static final CompoundTag EMPTY_TAG = new CompoundTag();
@@ -84,6 +86,8 @@ public class ItemStages implements StagesInit {
 
     @Override
     public void onStagesInit() {
+        Registry.register(Registry.ITEM, new Identifier("stages-item:unknown"), UNKNOWN_ITEM);
+
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             ItemStagesConfig.destroy();
             ItemStagesConfig.get().entries.forEach((id, entry) -> {
