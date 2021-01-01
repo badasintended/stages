@@ -1,8 +1,8 @@
 # stages-base
 
-### Commands
+## Commands
 
-#### Player selector
+### Player selector
 ```
 give @a[stages={test:a, !test:b}] minecraft:enchanted_golden_apple 64
                   |       |
@@ -11,7 +11,7 @@ give @a[stages={test:a, !test:b}] minecraft:enchanted_golden_apple 64
                   |---> must have this stage
 ```
 
-#### Player predicate
+### Player predicate
 [Predicate on Minecraft Wiki](https://minecraft.gamepedia.com/Predicate)
 ```json5
 // ...
