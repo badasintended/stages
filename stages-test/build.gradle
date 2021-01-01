@@ -1,3 +1,5 @@
+archivesBaseName = "stages-testmod"
+
 dependencies {
     afterEvaluate {
         rootProject.subprojects.each {

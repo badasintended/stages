@@ -16,7 +16,6 @@ subprojects {
     apply plugin: "maven-publish"
 
     group = "${rootProject.group}.${rootProject.archivesBaseName}"
-    archivesBaseName = name
     version = rootProject.version
 
     sourceSets {

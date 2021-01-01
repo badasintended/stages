@@ -32,9 +32,9 @@ jobs:
           MOD_VERSION: ${{ steps.vars.outputs.VERSION }}
       - uses: actions/upload-artifact@v2
         with:
-          name: base ${{ steps.vars.outputs.VERSION }}
-          path: "./stages-base/build/libs/**.jar"
+          name: api ${{ steps.vars.outputs.VERSION }}
+          path: "./stages-api/build/libs/**.jar"
       - uses: actions/upload-artifact@v2
         with:
-          name: item ${{ steps.vars.outputs.VERSION }}
-          path: "./stages-item/build/libs/**.jar"
+          name: itemstages ${{ steps.vars.outputs.VERSION }}
+          path: "./stages-itemstages/build/libs/**.jar"
