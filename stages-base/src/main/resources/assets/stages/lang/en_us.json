@@ -17,5 +17,7 @@
   "command.stages.all.sender"       : "%s stages added to %s",
 
   "command.stages.check.true"       : "%s has stage %s",
-  "command.stages.check.false"      : "%s does not have stage %s"
+  "command.stages.check.false"      : "%s does not have stage %s",
+
+  "argument.stages.unregistered"    : "Unregistered stage"
 }

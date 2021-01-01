@@ -57,6 +57,10 @@ public class StagesImpl implements Stages {
         }
     }
 
+    public static boolean isRegistered(Identifier stage) {
+        return O2I.containsKey(stage);
+    }
+
     public static int stage2int(Identifier stage) {
         return O2I.getInt(stage);
     }
@@ -104,8 +108,8 @@ public class StagesImpl implements Stages {
     }
 
     @Override
-    public boolean contains(Identifier stages) {
-        return this.stages.contains(stages);
+    public boolean contains(Identifier stage) {
+        return this.stages.contains(stage);
     }
 
     @Override

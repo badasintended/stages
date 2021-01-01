@@ -3,7 +3,7 @@
   "minVersion"        : "0.8",
   "package"           : "badasintended.stages.impl.mixin",
   "compatibilityLevel": "JAVA_8",
-  "mixins"            : ["PlayerEntityMixin"],
+  "mixins"            : ["EntitySelectorOptionsMixin", "EntitySelectorReaderMixin", "PlayerEntityMixin", "PlayerPredicateMixin"],
   "injectors"         : {
     "defaultRequire": 1
   }

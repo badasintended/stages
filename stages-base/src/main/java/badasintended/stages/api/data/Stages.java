@@ -37,6 +37,13 @@ public interface Stages {
     }
 
     /**
+     * @return whether stage is registered
+     */
+    static boolean isRegistered(Identifier stage) {
+        return StagesImpl.isRegistered(stage);
+    }
+
+    /**
      * Get stage from raw id
      */
     static Identifier getStage(int i) {
@@ -69,7 +76,7 @@ public interface Stages {
     /**
      * @return whether player has the stage
      */
-    boolean contains(Identifier stages);
+    boolean contains(Identifier stage);
 
     /**
      * Add new stage to player

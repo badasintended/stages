@@ -27,7 +27,7 @@ import net.minecraft.util.Identifier;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-public class StagesCommand {
+public class StageCommands {
 
     // @formatter:off
     private static final ArgumentType<?>
@@ -41,9 +41,9 @@ public class StagesCommand {
             literal("stage")
                 .then(silent("add", 2, (context, silent) -> edit(context, silent, true)))
                 .then(silent("remove", 2, (context, silent) -> edit(context, silent, false)))
-                .then(player("info", 0, StagesCommand::info))
-                .then(player("clear", 2, StagesCommand::clear))
-                .then(player("all", 2, StagesCommand::all))
+                .then(player("info", 0, StageCommands::info))
+                .then(player("clear", 2, StageCommands::clear))
+                .then(player("all", 2, StageCommands::all))
                 .then(literal("check")
                     .requires(sender -> sender.hasPermissionLevel(2))
                     .then(argument("stage", STAGE)

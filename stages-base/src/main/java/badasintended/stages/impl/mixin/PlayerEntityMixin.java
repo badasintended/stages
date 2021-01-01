@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerEntity.class)
-public class PlayerEntityMixin implements StageHolder {
+public abstract class PlayerEntityMixin implements StageHolder {
 
     @Unique
     protected final Stages stages = new StagesImpl((PlayerEntity) (Object) this);

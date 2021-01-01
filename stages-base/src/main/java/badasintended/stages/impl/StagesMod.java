@@ -6,7 +6,7 @@ import badasintended.stages.api.StagesUtil;
 import badasintended.stages.api.config.Config;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.init.StagesInit;
-import badasintended.stages.impl.command.StagesCommand;
+import badasintended.stages.impl.command.StageCommands;
 import badasintended.stages.impl.data.StagesImpl;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
@@ -33,7 +33,7 @@ public class StagesMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        StagesCommand.register();
+        StageCommands.register();
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             Config.CONFIGS.values().forEach(Config::destroy);
