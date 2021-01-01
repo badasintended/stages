@@ -3,8 +3,8 @@
 ### Commands
 
 #### Player selector
-```mcfunction
-/give @a[stages={test:a, !test:b}] minecraft:enchanted_golden_apple 64
+```
+give @a[stages={test:a, !test:b}] minecraft:enchanted_golden_apple 64
                   |       |
                   |       |---> must NOT have this stage
                   |
