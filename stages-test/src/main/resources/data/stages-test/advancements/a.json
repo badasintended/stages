@@ -1,0 +1,19 @@
+{
+  "display" : {
+    "icon"       : {
+      "item": "itemstages:unknown"
+    },
+    "title"      : "test/a",
+    "description": "yes"
+  },
+  "criteria": {
+    "test": {
+      "trigger"   : "stages:changed",
+      "conditions": {
+        "stages": {
+          "stages:test/a": true
+        }
+      }
+    }
+  }
+}

@@ -5,9 +5,12 @@ import java.nio.charset.StandardCharsets;
 import badasintended.stages.api.StagesUtil;
 import badasintended.stages.api.config.Config;
 import badasintended.stages.api.data.Stages;
+import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
+import badasintended.stages.impl.advancement.criterion.StagesChangedCriterion;
 import badasintended.stages.impl.command.StageCommands;
 import badasintended.stages.impl.data.StagesImpl;
+import badasintended.stages.impl.mixin.CriteriaAccessor;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -22,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 public class StagesMod implements ModInitializer {
 
     public static final Logger LOGGER = LogManager.getLogger(StagesUtil.MOD_ID);
+    public static final StagesChangedCriterion CRITERION = new StagesChangedCriterion();
 
     // @formatter:off
     public static final Identifier
@@ -34,6 +38,11 @@ public class StagesMod implements ModInitializer {
     @Override
     public void onInitialize() {
         StageCommands.register();
+        CriteriaAccessor.register(CRITERION);
+
+        StageEvents.ADDED.register((stages, stage) -> CRITERION.trigger(stages));
+        StageEvents.REMOVED.register((stages, stage) -> CRITERION.trigger(stages));
+        StageEvents.CLEARED.register(CRITERION::trigger);
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> Config.CONFIGS.values().forEach(Config::destroy));
 
