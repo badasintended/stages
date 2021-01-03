@@ -71,21 +71,12 @@ public class StagesImpl implements Stages, Tickable {
 
     public static void syncRegistry(ServerPlayerEntity player) {
         ServerPlayNetworking.send(player, StagesMod.BEGIN_SYNC_REGISTRY, new PacketByteBuf(Unpooled.buffer()));
-
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        int i = 0;
-        for (Identifier value : I2O.values()) {
-            if (i % 10 == 0) {
-                ServerPlayNetworking.send(player, StagesMod.SYNC_REGISTRY, buf);
-                buf = new PacketByteBuf(Unpooled.buffer());
-            }
-            buf.writeIdentifier(value);
-            i++;
-        }
-        if (i % 10 != 0) {
+        O2I.forEach((stage, i) -> {
+            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+            buf.writeVarInt(i);
+            buf.writeIdentifier(stage);
             ServerPlayNetworking.send(player, StagesMod.SYNC_REGISTRY, buf);
-        }
-
+        });
         ServerPlayNetworking.send(player, StagesMod.END_SYNC_REGISTRY, new PacketByteBuf(Unpooled.buffer()));
     }
 
@@ -95,6 +86,12 @@ public class StagesImpl implements Stages, Tickable {
         O2I.clear();
         lastIntKey = 0;
         registryLocked = false;
+    }
+
+    @Environment(EnvType.CLIENT)
+    public static void syncRegistry(int i, Identifier stage) {
+        I2O.put(i, stage);
+        O2I.put(stage, i);
     }
 
     @Environment(EnvType.CLIENT)

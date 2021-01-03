@@ -1,0 +1,17 @@
+{
+  "display" : {
+    "icon"       : {
+      "item": "itemstages:unknown"
+    },
+    "title"      : "test/b",
+    "description": "yes"
+  },
+  "criteria": {
+    "test": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards" : {
+    "stages": ["stages:test/b"]
+  }
+}

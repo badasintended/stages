@@ -4,7 +4,7 @@
   "package"           : "badasintended.stages.impl.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins"            : [
-    "CriteriaAccessor",
+    "AdvancementRewardsMixin",
     "EntitySelectorOptionsMixin",
     "EntitySelectorReaderMixin",
     "PlayerEntityMixin",

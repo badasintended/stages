@@ -32,13 +32,10 @@ public class StagesModClient implements ClientModInitializer {
         );
 
         ClientPlayNetworking.registerGlobalReceiver(StagesMod.SYNC_REGISTRY, (client, handler, buf, sender) -> {
-            int size = buf.readVarInt();
-            Identifier[] stages = new Identifier[size];
-            for (int i = 0; i < size; i++) {
-                stages[i] = buf.readIdentifier();
-            }
+            int i = buf.readVarInt();
+            Identifier stage = buf.readIdentifier();
 
-            client.execute(() -> Stages.register(stages));
+            client.execute(() -> StagesImpl.syncRegistry(i, stage));
         });
 
         ClientPlayNetworking.registerGlobalReceiver(StagesMod.END_SYNC_REGISTRY, (client, handler, buf, sender) ->

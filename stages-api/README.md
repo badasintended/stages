@@ -1,4 +1,4 @@
-# stages-base
+# stages
 
 ## Commands
 
@@ -45,6 +45,16 @@
         }
       }
     }
+  }
+}
+```
+
+### Advancement Rewards
+[Advancement on Minecraft Wiki](https://minecraft.gamepedia.com/Advancement/JSON_format)
+```json5
+{
+  "rewards": {
+    "stages": ["test:a", "test:b"]
   }
 }
 ```

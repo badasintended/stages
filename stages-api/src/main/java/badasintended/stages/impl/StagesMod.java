@@ -9,11 +9,11 @@ import badasintended.stages.api.init.StagesInit;
 import badasintended.stages.impl.advancement.criterion.StagesChangedCriterion;
 import badasintended.stages.impl.command.StageCommands;
 import badasintended.stages.impl.data.StagesImpl;
-import badasintended.stages.impl.mixin.CriteriaAccessor;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.object.builder.v1.advancement.CriterionRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -37,7 +37,7 @@ public class StagesMod implements ModInitializer {
     @Override
     public void onInitialize() {
         StageCommands.register();
-        CriteriaAccessor.register(CRITERION);
+        CriterionRegistry.register(CRITERION);
 
         StageEvents.CHANGED.register(CRITERION::trigger);
 
