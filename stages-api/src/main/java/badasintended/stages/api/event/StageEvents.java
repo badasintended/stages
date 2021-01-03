@@ -23,17 +23,6 @@ public final class StageEvents {
     });
 
     /**
-     * Called on {@link Stages#add(Identifier)} <b>after</b> a stage is added to a player.<br>
-     * The player has the stage when this even is called.
-     */
-    public static final Event<Added> ADDED = createArrayBacked(Added.class, callbacks -> (stages, stage) -> {
-        for (Added callback : callbacks) {
-            callback.onAdded(stages, stage);
-        }
-    });
-
-
-    /**
      * Called on {@link Stages#remove(Identifier)} <b>before</b> a stage is removed from a player.<br>
      * The player <b>still</b> has the stage when this event is called.<br>
      * return {@code false} to cancel the removal
@@ -48,22 +37,12 @@ public final class StageEvents {
     });
 
     /**
-     * Called on {@link Stages#remove(Identifier)} <b>after</b> a stage is removed from a player.<br>
-     * The stage is already removed from player when this even is called.
+     * Called on the next tick after {@link Stages} is changed (addition, removal).<br>
+     * Called both on server and client side.
      */
-    public static final Event<Removed> REMOVED = createArrayBacked(Removed.class, callbacks -> (stages, stage) -> {
-        for (Removed callback : callbacks) {
-            callback.onRemoved(stages, stage);
-        }
-    });
-
-    /**
-     * Called on {@link Stages#clear()} <b>after</b> all stages are removed from a player.<br>
-     * The player does not have any stage when this event is called.
-     */
-    public static final Event<Cleared> CLEARED = createArrayBacked(Cleared.class, callbacks -> (stages) -> {
-        for (Cleared callback : callbacks) {
-            callback.onCleared(stages);
+    public static final Event<Changed> CHANGED = createArrayBacked(Changed.class, callbacks -> stages -> {
+        for (Changed callback : callbacks) {
+            callback.onChanged(stages);
         }
     });
 
@@ -75,13 +54,6 @@ public final class StageEvents {
     }
 
     @FunctionalInterface
-    public interface Added {
-
-        void onAdded(Stages stages, Identifier stage);
-
-    }
-
-    @FunctionalInterface
     public interface Remove {
 
         boolean onRemove(Stages stages, Identifier stage);
@@ -89,16 +61,9 @@ public final class StageEvents {
     }
 
     @FunctionalInterface
-    public interface Removed {
+    public interface Changed {
 
-        void onRemoved(Stages stages, Identifier stage);
-
-    }
-
-    @FunctionalInterface
-    public interface Cleared {
-
-        void onCleared(Stages stages);
+        void onChanged(Stages stages);
 
     }
 

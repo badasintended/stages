@@ -20,8 +20,5 @@
     "fabricloader": ">=0.7.4",
     "fabric"      : "*",
     "minecraft"   : "*"
-  },
-  "custom": {
-    "modmenu:api": true
   }
 }

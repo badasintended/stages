@@ -106,9 +106,9 @@ public class ItemStages implements StagesInit {
             entries.forEach((id, entry) -> editLockedItems(stages, id));
         });
 
-        StageEvents.ADDED.register(ItemStages::editLockedItems);
-        StageEvents.REMOVED.register(ItemStages::editLockedItems);
-        StageEvents.CLEARED.register(stages -> {
+        //StageEvents.ADDED.register(ItemStages::editLockedItems);
+        //StageEvents.REMOVED.register(ItemStages::editLockedItems);
+        StageEvents.CHANGED.register(stages -> {
             Map<Identifier, ItemStagesConfig.Entry> entries = CONFIG.get().entries;
             entries.forEach((id, entry) -> editLockedItems(stages, id));
         });

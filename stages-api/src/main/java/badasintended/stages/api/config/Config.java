@@ -30,7 +30,8 @@ public final class Config<T> {
      * Create new config with default gson<br>
      * Config json can be located on {@code .minecraft/config/stages/<name>.json}
      *
-     * @param synced whether this config should be synced to client
+     * @param configClass must have a constructor with empty parameter
+     * @param synced      whether this config should be synced to client
      */
     public static <T> Config<T> create(Class<T> configClass, String name, boolean synced) {
         return create(configClass, name, synced, gsonBuilder -> gsonBuilder);
@@ -40,8 +41,9 @@ public final class Config<T> {
      * Create new config with custom gson<br>
      * Config json can be located on {@code .minecraft/config/stages/<name>.json}
      *
-     * @param synced whether this config should be synced to client
-     * @param gson   <b>do not call {@link GsonBuilder#setPrettyPrinting()}</b>
+     * @param configClass must have a constructor with empty parameter
+     * @param synced      whether this config should be synced to client
+     * @param gson        <b>do not call {@link GsonBuilder#setPrettyPrinting()}</b>
      */
     public static <T> Config<T> create(Class<T> configClass, String name, boolean synced, Function<GsonBuilder, GsonBuilder> gson) {
         if (CONFIGS.containsKey(name)) {
@@ -67,7 +69,7 @@ public final class Config<T> {
     }
 
 
-    // -------------------------------------------------------------------------------------------------
+    /* -------------------------------------------------------------------------------------------------------------------------------------------- */
 
 
     private final Class<T> configClass;
@@ -113,7 +115,8 @@ public final class Config<T> {
     }
 
     /**
-     * Invalidate config and force reload on next {@link #get()}
+     * Invalidate config and force reload on next {@link #get()}.<br>
+     * All changes to config will be lost.
      */
     public void destroy() {
         config = null;

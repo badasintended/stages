@@ -1,6 +1,6 @@
 package badasintended.stages.impl.test;
 
-import badasintended.stages.api.event.StageSyncEvents;
+import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.ClientStagesInit;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
@@ -17,7 +17,7 @@ public class StagesTestClient implements ClientStagesInit {
 
     @Override
     public void onStagesClientInit() {
-        StageSyncEvents.SYNC.register(stages -> {
+        StageEvents.CHANGED.register(stages -> {
             StagesTest.LOGGER.info("synced : {}", stages.getPlayer().getDisplayName().getString());
 
             a = stages.contains(StagesTest.A);

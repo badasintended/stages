@@ -8,6 +8,4 @@ public interface StageHolder {
 
     Stages stages$getStages();
 
-    void stages$scheduleSync();
-
 }

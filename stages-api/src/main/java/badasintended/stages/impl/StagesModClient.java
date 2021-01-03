@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 import badasintended.stages.api.StagesUtil;
 import badasintended.stages.api.config.Config;
 import badasintended.stages.api.data.Stages;
-import badasintended.stages.api.event.StageSyncEvents;
 import badasintended.stages.api.init.ClientStagesInit;
 import badasintended.stages.impl.data.StagesImpl;
 import net.fabricmc.api.ClientModInitializer;
@@ -28,6 +27,10 @@ public class StagesModClient implements ClientModInitializer {
             client.execute(() -> Config.CONFIGS.get(name).fromJson(json));
         });
 
+        ClientPlayNetworking.registerGlobalReceiver(StagesMod.BEGIN_SYNC_REGISTRY, (client, handler, buf, sender) ->
+            client.execute(StagesImpl::beginSyncRegistry)
+        );
+
         ClientPlayNetworking.registerGlobalReceiver(StagesMod.SYNC_REGISTRY, (client, handler, buf, sender) -> {
             int size = buf.readVarInt();
             Identifier[] stages = new Identifier[size];
@@ -35,8 +38,12 @@ public class StagesModClient implements ClientModInitializer {
                 stages[i] = buf.readIdentifier();
             }
 
-            client.execute(() -> StagesImpl.syncRegistry(stages));
+            client.execute(() -> Stages.register(stages));
         });
+
+        ClientPlayNetworking.registerGlobalReceiver(StagesMod.END_SYNC_REGISTRY, (client, handler, buf, sender) ->
+            client.execute(StagesImpl::endSyncRegistry)
+        );
 
         ClientPlayNetworking.registerGlobalReceiver(StagesMod.SYNC_STAGES, (client, handler, buf, sender) -> {
             int size = buf.readVarInt();
@@ -48,13 +55,7 @@ public class StagesModClient implements ClientModInitializer {
             client.execute(() -> {
                 PlayerEntity player = client.player;
                 StagesImpl data = (StagesImpl) Stages.get(player);
-                data.toggleEvents();
-                data.clear();
-                for (int stage : stages) {
-                    data.add(Stages.getStage(stage));
-                }
-                data.toggleEvents();
-                StageSyncEvents.SYNC.invoker().onSync(data);
+                data.sync(stages);
             });
         });
 
@@ -64,6 +65,7 @@ public class StagesModClient implements ClientModInitializer {
             init.onStagesClientInit();
             StagesMod.LOGGER.info("[stages] |=> loaded {} from {}", init.getClass().getName(), container.getProvider().getMetadata().getId());
         });
+        StagesMod.LOGGER.info("[stages] done");
     }
 
 }

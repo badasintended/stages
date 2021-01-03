@@ -7,6 +7,7 @@ import net.fabricmc.api.Environment;
  * Convenient client side entrypoint.<br>
  * The JSON entry id is {@code stages:client}
  */
+@FunctionalInterface
 @Environment(EnvType.CLIENT)
 public interface ClientStagesInit {
 

@@ -112,7 +112,6 @@ public class StageCommands {
             } else {
                 stages.remove(stage);
             }
-            stages.sync();
             if (!silent || BoolArgumentType.getBool(context, "silent")) {
                 source.sendFeedback(new TranslatableText("command.stages.edit.target." + add, stage), true);
                 if (player != sender) {
@@ -141,7 +140,6 @@ public class StageCommands {
         Stages stages = Stages.get(player);
         int size = stages.values().size();
         stages.clear();
-        stages.sync();
         source.sendFeedback(new TranslatableText("command.stages.clear.target", size), true);
         if (player != sender) {
             source.sendFeedback(new TranslatableText("command.stages.clear.sender", size, player.getDisplayName()), true);
@@ -167,7 +165,6 @@ public class StageCommands {
         int before = stages.values().size();
         stages.addAll(Stages.allStages());
         int after = stages.values().size();
-        stages.sync();
         source.sendFeedback(new TranslatableText("command.stages.all.target", after - before), true);
         if (player != sender) {
             source.sendFeedback(new TranslatableText("command.stages.all.sender", after - before, sender.getDisplayName()), true);

@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 
 import badasintended.stages.api.StagesUtil;
 import badasintended.stages.api.config.Config;
-import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
 import badasintended.stages.impl.advancement.criterion.StagesChangedCriterion;
@@ -15,7 +14,6 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -29,10 +27,11 @@ public class StagesMod implements ModInitializer {
 
     // @formatter:off
     public static final Identifier
-        SYNC_REGISTRY = StagesUtil.id("sync_registry"),
-        SYNC_STAGES   = StagesUtil.id("sync_stages"),
-        SYNC_CONFIG   = StagesUtil.id("sync_config"),
-        REQUEST_SYNC  = StagesUtil.id("request_sync_stages");
+        BEGIN_SYNC_REGISTRY = StagesUtil.id("begin_sync_registry"),
+        SYNC_REGISTRY       = StagesUtil.id("sync_registry"),
+        END_SYNC_REGISTRY   = StagesUtil.id("end_sync_registry"),
+        SYNC_STAGES         = StagesUtil.id("sync_stages"),
+        SYNC_CONFIG         = StagesUtil.id("sync_config");
     // @formatter:on
 
     @Override
@@ -40,11 +39,10 @@ public class StagesMod implements ModInitializer {
         StageCommands.register();
         CriteriaAccessor.register(CRITERION);
 
-        StageEvents.ADDED.register((stages, stage) -> CRITERION.trigger(stages));
-        StageEvents.REMOVED.register((stages, stage) -> CRITERION.trigger(stages));
-        StageEvents.CLEARED.register(CRITERION::trigger);
+        StageEvents.CHANGED.register(CRITERION::trigger);
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> Config.CONFIGS.values().forEach(Config::destroy));
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> StagesImpl.lockRegistry());
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             StagesImpl.syncRegistry(handler.player);
@@ -58,15 +56,13 @@ public class StagesMod implements ModInitializer {
             });
         });
 
-        ServerPlayNetworking.registerGlobalReceiver(REQUEST_SYNC, (server, player, handler, buf, sender) ->
-            server.execute(() -> Stages.get(player).sync()));
-
         LOGGER.info("[stages] Loading StagesInit");
         FabricLoader.getInstance().getEntrypointContainers(StagesUtil.MOD_ID + ":main", StagesInit.class).forEach(container -> {
             StagesInit init = container.getEntrypoint();
             init.onStagesInit();
             LOGGER.info("[stages] |=> loaded {} from {}", init.getClass().getName(), container.getProvider().getMetadata().getId());
         });
+        LOGGER.info("[stages] done");
     }
 
 }

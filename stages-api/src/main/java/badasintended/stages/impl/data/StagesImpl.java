@@ -23,8 +23,9 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Tickable;
 
-public class StagesImpl implements Stages {
+public class StagesImpl implements Stages, Tickable {
 
     private static final Int2ObjectOpenHashMap<Identifier> I2O = new Int2ObjectOpenHashMap<>();
     private static final Object2IntOpenHashMap<Identifier> O2I = new Object2IntOpenHashMap<>();
@@ -32,21 +33,12 @@ public class StagesImpl implements Stages {
     private static final String TAG_NAME = "Stages";
 
     private static int lastIntKey = 0;
-
-    private final ObjectSet<Identifier> stages = new ObjectOpenHashSet<>();
-    private final ObjectSet<Identifier> immutableStages = ObjectSets.unmodifiable(stages);
-
-    private final PlayerEntity player;
-    private final boolean isClient;
-
-    private boolean skipEvents = false;
-
-    public StagesImpl(PlayerEntity player) {
-        this.player = player;
-        this.isClient = player instanceof ClientPlayerEntity;
-    }
+    private static boolean registryLocked = false;
 
     public static void register(Identifier... stages) {
+        if (registryLocked) {
+            throw new UnsupportedOperationException("[stages] Attempting to register new stage at server runtime");
+        }
         for (Identifier stage : stages) {
             if (O2I.containsKey(stage)) {
                 I2O.remove(O2I.getInt(stage));
@@ -73,23 +65,64 @@ public class StagesImpl implements Stages {
         return I2O.values();
     }
 
+    public static void lockRegistry() {
+        registryLocked = true;
+    }
+
     public static void syncRegistry(ServerPlayerEntity player) {
+        ServerPlayNetworking.send(player, StagesMod.BEGIN_SYNC_REGISTRY, new PacketByteBuf(Unpooled.buffer()));
+
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        buf.writeVarInt(I2O.size());
-        I2O.forEach((i, id) -> buf.writeIdentifier(id));
-        ServerPlayNetworking.send(player, StagesMod.SYNC_REGISTRY, buf);
+        int i = 0;
+        for (Identifier value : I2O.values()) {
+            if (i % 10 == 0) {
+                ServerPlayNetworking.send(player, StagesMod.SYNC_REGISTRY, buf);
+                buf = new PacketByteBuf(Unpooled.buffer());
+            }
+            buf.writeIdentifier(value);
+            i++;
+        }
+        if (i % 10 != 0) {
+            ServerPlayNetworking.send(player, StagesMod.SYNC_REGISTRY, buf);
+        }
+
+        ServerPlayNetworking.send(player, StagesMod.END_SYNC_REGISTRY, new PacketByteBuf(Unpooled.buffer()));
     }
 
     @Environment(EnvType.CLIENT)
-    public static void syncRegistry(Identifier... stages) {
+    public static void beginSyncRegistry() {
         I2O.clear();
         O2I.clear();
         lastIntKey = 0;
-        register(stages);
+        registryLocked = false;
     }
 
-    public void toggleEvents() {
-        this.skipEvents = !this.skipEvents;
+    @Environment(EnvType.CLIENT)
+    public static void endSyncRegistry() {
+        registryLocked = true;
+    }
+
+
+    // --------------------------------------------------------------------------------------------
+
+
+    private final ObjectSet<Identifier> stages = new ObjectOpenHashSet<>();
+    private final ObjectSet<Identifier> immutableStages = ObjectSets.unmodifiable(stages);
+
+    private final PlayerEntity player;
+    private final boolean isClient;
+
+    private boolean changed = false;
+
+    public StagesImpl(PlayerEntity player) {
+        this.player = player;
+        this.isClient = player instanceof ClientPlayerEntity;
+    }
+
+    private void assertServerSide() {
+        if (isClient) {
+            throw new UnsupportedOperationException("[stages] Attempting to modify stages on client side");
+        }
     }
 
     @Override
@@ -114,48 +147,39 @@ public class StagesImpl implements Stages {
 
     @Override
     public void add(Identifier stage) {
-        if (O2I.containsKey(stage)) {
-            if (skipEvents) {
-                stages.add(stage);
-            } else if (StageEvents.ADD.invoker().onAdd(this, stage)) {
-                stages.add(stage);
-                StageEvents.ADDED.invoker().onAdded(this, stage);
-            }
-        } else {
+        assertServerSide();
+        if (!O2I.containsKey(stage)) {
             StagesMod.LOGGER.error("[stages] Attempting to add unregistered stage id {}", stage);
+        } else if (StageEvents.ADD.invoker().onAdd(this, stage)) {
+            stages.add(stage);
+            changed = true;
         }
     }
 
     @Override
     public void remove(Identifier stage) {
-        if (skipEvents) {
-            stages.remove(stage);
+        assertServerSide();
+        if (!O2I.containsKey(stage)) {
+            StagesMod.LOGGER.error("[stages] Attempting to remove unregistered stage id {}", stage);
         } else if (StageEvents.REMOVE.invoker().onRemove(this, stage)) {
             stages.remove(stage);
-            StageEvents.REMOVED.invoker().onRemoved(this, stage);
+            changed = true;
         }
     }
 
     @Override
     public void clear() {
+        assertServerSide();
         stages.clear();
-        if (!skipEvents) {
-            StageEvents.CLEARED.invoker().onCleared(this);
-        }
-    }
-
-    @Override
-    public void sync() {
-        ((StageHolder) player).stages$scheduleSync();
+        changed = true;
     }
 
     @Override
     public void fromTag(CompoundTag tag) {
-        toggleEvents();
         clear();
         ListTag list = tag.getList(TAG_NAME, NbtType.STRING);
-        list.forEach(s -> add(new Identifier(s.asString())));
-        toggleEvents();
+        list.forEach(s -> stages.add(new Identifier(s.asString())));
+        changed = true;
     }
 
     @Override
@@ -166,5 +190,28 @@ public class StagesImpl implements Stages {
         return tag;
     }
 
+    @Override
+    public void tick() {
+        if (changed) {
+            StageEvents.CHANGED.invoker().onChanged(this);
+            changed = false;
+            if (!isClient) {
+                PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+                buf.writeVarInt(stages.size());
+                stages.forEach(s -> buf.writeVarInt(Stages.getRawId(s)));
+
+                ServerPlayNetworking.send((ServerPlayerEntity) player, StagesMod.SYNC_STAGES, buf);
+            }
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    public void sync(int[] stageIds) {
+        stages.clear();
+        for (int stageId : stageIds) {
+            stages.add(int2stage(stageId));
+        }
+        changed = true;
+    }
 
 }
