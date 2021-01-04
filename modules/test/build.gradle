@@ -1,8 +1,6 @@
-archivesBaseName = "stages-testmod"
-
 dependencies {
     afterEvaluate {
-        rootProject.subprojects.each {
+        project(":modules").subprojects.each {
             if (it.name != name) implementation it
         }
     }

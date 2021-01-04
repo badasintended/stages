@@ -2,10 +2,8 @@ repositories {
     jcenter()
 }
 
-archivesBaseName = "itemstages"
+moduleDep(project, "stages")
 
 dependencies {
-    implementation project(":stages-api")
-
     modImplementation "me.shedaniel:RoughlyEnoughItems:${rootProject.rei}"
 }

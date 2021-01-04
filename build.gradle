@@ -4,19 +4,30 @@ plugins {
     id "maven-publish"
 }
 
-def versionEnv = System.getenv("MOD_VERSION")
-if (versionEnv == null || versionEnv.isBlank()) {
-    versionEnv = "SNAPSHOT"
+def gitHash = System.getenv("GIT_HASH")
+if (gitHash == null || gitHash.isBlank()) {
+    gitHash = "local"
+}
+def release = System.getenv("RELEASE")
+release = release == null ? false : release.toBoolean()
+
+def moduleDep(Project project, String... deps) {
+    project.dependencies {
+        deps.each {
+            implementation project.project(":modules:$it")
+        }
+    }
 }
 
-version = "${versionEnv}"
-
-subprojects {
+project(":modules").subprojects {
     apply plugin: "fabric-loom"
+    apply plugin: "com.github.fudge.forgedflowerloom"
     apply plugin: "maven-publish"
 
-    group = "${rootProject.group}.${rootProject.archivesBaseName}"
-    version = rootProject.version
+    group = "${rootProject.group}"
+    archivesBaseName = name
+    version = "${rootProject.getProperties().get(name)}"
+    if (!release) version += "+${gitHash}"
 
     sourceSets {
         testmod {
@@ -71,9 +82,7 @@ subprojects {
         }
 
         jar {
-            from("LICENSE") {
-                rename { "${it}_${project.archivesBaseName}"}
-            }
+            from("../../LICENSE")
         }
     }
 

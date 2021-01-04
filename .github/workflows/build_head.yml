@@ -16,7 +16,7 @@ jobs:
     steps:
       - id: vars
         run: |
-          echo ::set-output name=VERSION::${GITHUB_REF#refs/*/}@${GITHUB_SHA:0:7}
+          echo ::set-output name=HASH::${GITHUB_SHA:0:7}
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
         with:
@@ -29,12 +29,17 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
       - run: ./gradlew build
         env:
-          MOD_VERSION: ${{ steps.vars.outputs.VERSION }}
+          GIT_HASH: ${{ steps.vars.outputs.HASH }}
+          RELEASE: false
       - uses: actions/upload-artifact@v2
         with:
-          name: stages ${{ steps.vars.outputs.VERSION }}
-          path: "./stages-api/build/libs/**.jar"
+          name: stages ${{ steps.vars.outputs.HASH }}
+          path: "./modules/stages/build/libs/**.jar"
       - uses: actions/upload-artifact@v2
         with:
-          name: itemstages ${{ steps.vars.outputs.VERSION }}
-          path: "./stages-itemstages/build/libs/**.jar"
+          name: itemstages ${{ steps.vars.outputs.HASH }}
+          path: "./modules/itemstages/build/libs/**.jar"
+      - uses: actions/upload-artifact@v2
+        with:
+          name: test ${{ steps.vars.outputs.HASH }}
+          path: "./modules/test/build/libs/**.jar"

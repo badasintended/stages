@@ -9,6 +9,6 @@ pluginManagement {
     }
 }
 
-include 'stages-api'
-include 'stages-itemstages'
-include 'stages-test'
+include 'modules:itemstages'
+include 'modules:stages'
+include 'modules:test'
