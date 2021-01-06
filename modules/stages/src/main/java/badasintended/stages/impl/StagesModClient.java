@@ -4,8 +4,10 @@ import java.nio.charset.StandardCharsets;
 
 import badasintended.stages.api.StagesUtil;
 import badasintended.stages.api.config.Config;
+import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.init.ClientStagesInit;
+import badasintended.stages.impl.data.StageRegistryImpl;
 import badasintended.stages.impl.data.StagesImpl;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -24,22 +26,25 @@ public class StagesModClient implements ClientModInitializer {
             String name = buf.readString();
             String json = new String(buf.readByteArray(), StandardCharsets.UTF_8);
 
-            client.execute(() -> Config.CONFIGS.get(name).fromJson(json));
+            client.execute(() -> {
+                Config.CONFIGS.get(name).fromJson(json);
+                StagesMod.LOGGER.info("[stages] Synced config \"{}\"", name);
+            });
         });
 
         ClientPlayNetworking.registerGlobalReceiver(StagesMod.BEGIN_SYNC_REGISTRY, (client, handler, buf, sender) ->
-            client.execute(StagesImpl::beginSyncRegistry)
+            client.execute(StageRegistryImpl::destroy)
         );
 
         ClientPlayNetworking.registerGlobalReceiver(StagesMod.SYNC_REGISTRY, (client, handler, buf, sender) -> {
             int i = buf.readVarInt();
             Identifier stage = buf.readIdentifier();
 
-            client.execute(() -> StagesImpl.syncRegistry(i, stage));
+            client.execute(() -> StageRegistryImpl.syncRegistry(i, stage));
         });
 
         ClientPlayNetworking.registerGlobalReceiver(StagesMod.END_SYNC_REGISTRY, (client, handler, buf, sender) ->
-            client.execute(StagesImpl::endSyncRegistry)
+            client.execute(() -> StagesMod.LOGGER.info("[stages] Registry synced, total {} stages", StageRegistry.allStages().size()))
         );
 
         ClientPlayNetworking.registerGlobalReceiver(StagesMod.SYNC_STAGES, (client, handler, buf, sender) -> {

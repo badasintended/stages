@@ -3,6 +3,7 @@ package badasintended.stages.impl.mixin;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.impl.command.StageSelectorHolder;
 import com.mojang.brigadier.StringReader;
@@ -53,7 +54,7 @@ public abstract class EntitySelectorOptionsMixin {
                     boolean not = selector.readNegationCharacter();
 
                     Identifier stageId = Identifier.fromCommandInput(string);
-                    if (!Stages.isRegistered(stageId)) {
+                    if (!StageRegistry.isRegistered(stageId)) {
                         throw UNREGISTERED_STAGE.createWithContext(string);
                     }
 

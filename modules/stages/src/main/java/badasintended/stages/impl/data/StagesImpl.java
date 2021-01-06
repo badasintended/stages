@@ -2,12 +2,11 @@ package badasintended.stages.impl.data;
 
 import java.util.Collection;
 
+import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.impl.StagesMod;
 import io.netty.buffer.Unpooled;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
@@ -27,77 +26,7 @@ import net.minecraft.util.Tickable;
 
 public class StagesImpl implements Stages, Tickable {
 
-    private static final Int2ObjectOpenHashMap<Identifier> I2O = new Int2ObjectOpenHashMap<>();
-    private static final Object2IntOpenHashMap<Identifier> O2I = new Object2IntOpenHashMap<>();
-
     private static final String TAG_NAME = "Stages";
-
-    private static int lastIntKey = 0;
-    private static boolean registryLocked = false;
-
-    public static void register(Identifier... stages) {
-        if (registryLocked) {
-            throw new UnsupportedOperationException("[stages] Attempting to register new stage at server runtime");
-        }
-        for (Identifier stage : stages) {
-            if (O2I.containsKey(stage)) {
-                I2O.remove(O2I.getInt(stage));
-            }
-            I2O.put(lastIntKey, stage);
-            O2I.put(stage, lastIntKey);
-            lastIntKey++;
-        }
-    }
-
-    public static boolean isRegistered(Identifier stage) {
-        return O2I.containsKey(stage);
-    }
-
-    public static int stage2int(Identifier stage) {
-        return O2I.getInt(stage);
-    }
-
-    public static Identifier int2stage(int i) {
-        return I2O.get(i);
-    }
-
-    public static Collection<Identifier> allStages() {
-        return I2O.values();
-    }
-
-    public static void lockRegistry() {
-        registryLocked = true;
-    }
-
-    public static void syncRegistry(ServerPlayerEntity player) {
-        ServerPlayNetworking.send(player, StagesMod.BEGIN_SYNC_REGISTRY, new PacketByteBuf(Unpooled.buffer()));
-        O2I.forEach((stage, i) -> {
-            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-            buf.writeVarInt(i);
-            buf.writeIdentifier(stage);
-            ServerPlayNetworking.send(player, StagesMod.SYNC_REGISTRY, buf);
-        });
-        ServerPlayNetworking.send(player, StagesMod.END_SYNC_REGISTRY, new PacketByteBuf(Unpooled.buffer()));
-    }
-
-    @Environment(EnvType.CLIENT)
-    public static void beginSyncRegistry() {
-        I2O.clear();
-        O2I.clear();
-        lastIntKey = 0;
-        registryLocked = false;
-    }
-
-    @Environment(EnvType.CLIENT)
-    public static void syncRegistry(int i, Identifier stage) {
-        I2O.put(i, stage);
-        O2I.put(stage, i);
-    }
-
-    @Environment(EnvType.CLIENT)
-    public static void endSyncRegistry() {
-        registryLocked = true;
-    }
 
 
     // --------------------------------------------------------------------------------------------
@@ -145,7 +74,7 @@ public class StagesImpl implements Stages, Tickable {
     @Override
     public void add(Identifier stage) {
         assertServerSide();
-        if (!O2I.containsKey(stage)) {
+        if (!StageRegistry.isRegistered(stage)) {
             StagesMod.LOGGER.error("[stages] Attempting to add unregistered stage id {}", stage);
         } else if (StageEvents.ADD.invoker().onAdd(this, stage)) {
             stages.add(stage);
@@ -156,7 +85,7 @@ public class StagesImpl implements Stages, Tickable {
     @Override
     public void remove(Identifier stage) {
         assertServerSide();
-        if (!O2I.containsKey(stage)) {
+        if (!StageRegistry.isRegistered(stage)) {
             StagesMod.LOGGER.error("[stages] Attempting to remove unregistered stage id {}", stage);
         } else if (StageEvents.REMOVE.invoker().onRemove(this, stage)) {
             stages.remove(stage);
@@ -168,6 +97,11 @@ public class StagesImpl implements Stages, Tickable {
     public void clear() {
         assertServerSide();
         stages.clear();
+        changed = true;
+    }
+
+    @Override
+    public void sync() {
         changed = true;
     }
 
@@ -195,7 +129,7 @@ public class StagesImpl implements Stages, Tickable {
             if (!isClient) {
                 PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
                 buf.writeVarInt(stages.size());
-                stages.forEach(s -> buf.writeVarInt(Stages.getRawId(s)));
+                stages.forEach(s -> buf.writeVarInt(StageRegistry.getRawId(s)));
 
                 ServerPlayNetworking.send((ServerPlayerEntity) player, StagesMod.SYNC_STAGES, buf);
             }
@@ -206,7 +140,7 @@ public class StagesImpl implements Stages, Tickable {
     public void sync(int[] stageIds) {
         stages.clear();
         for (int stageId : stageIds) {
-            stages.add(int2stage(stageId));
+            stages.add(StageRegistry.getStage(stageId));
         }
         changed = true;
     }

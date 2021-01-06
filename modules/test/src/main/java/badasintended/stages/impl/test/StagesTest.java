@@ -1,7 +1,6 @@
 package badasintended.stages.impl.test;
 
 import badasintended.stages.api.StagesUtil;
-import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
 import net.minecraft.util.Identifier;
@@ -26,7 +25,10 @@ public class StagesTest implements StagesInit {
 
     @Override
     public void onStagesInit() {
-        Stages.register(A, B, C, D, E);
+
+        StageEvents.REGISTRY.register(registry ->
+            registry.register(A, B, C, D, E)
+        );
 
         StageEvents.CHANGED.register(stages ->
             LOGGER.info("changed {}", stages.getPlayer().getDisplayName().getString())

@@ -3,8 +3,8 @@ package badasintended.itemstages.mixin;
 import java.util.Map;
 import java.util.Set;
 
-import badasintended.itemstages.ItemStageHolder;
 import badasintended.itemstages.ItemStages;
+import badasintended.itemstages.ItemStagesHolder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerEntity.class)
-public abstract class PlayerEntityMixin implements ItemStageHolder {
+public abstract class PlayerEntityMixin implements ItemStagesHolder {
 
     @Shadow
     private ItemStack selectedItem;

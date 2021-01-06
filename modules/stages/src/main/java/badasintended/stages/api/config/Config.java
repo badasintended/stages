@@ -10,13 +10,12 @@ import java.util.function.Function;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 
 /**
  * Config holder with optional s2c syncing
  * <ul>
- *     <li>Config will be {@link #destroy() destroyed} on {@link ServerLifecycleEvents#SERVER_STARTING server start}</li>
+ *     <li>Config will be {@link #destroy() destroyed} on datapack load/reload</li>
  *     <li>Config Gson's {@link GsonBuilder#enableComplexMapKeySerialization() complexMapKeySerialization} is enabled</li>
  * </ul>
  */
@@ -67,9 +66,6 @@ public final class Config<T> {
             throw new RuntimeException("Failed to create config folder", e);
         }
     }
-
-
-    /* -------------------------------------------------------------------------------------------------------------------------------------------- */
 
 
     private final Class<T> configClass;

@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "id"           : "stages-test",
-  "version"      : "0.0.0",
+  "version"      : "${version}",
   "authors"      : ["deirn"],
   "license"      : "LGPL-2.1",
   "environment"  : "*",
   "entrypoints"  : {
     "stages:main"  : ["badasintended.stages.impl.test.StagesTest"],
     "stages:client": ["badasintended.stages.impl.test.StagesTestClient"]
+  },
+  "custom"       : {
+    "modmenu:parent": "stages"
   }
 }

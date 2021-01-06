@@ -1,0 +1,80 @@
+package badasintended.stages.impl.data;
+
+import java.util.Collection;
+
+import badasintended.stages.api.data.StageRegistry;
+import badasintended.stages.impl.StagesMod;
+import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
+
+public class StageRegistryImpl implements StageRegistry {
+
+    private static StageRegistryImpl instance = null;
+
+    public static StageRegistryImpl get() {
+        if (instance == null) {
+            instance = new StageRegistryImpl();
+        }
+        return instance;
+    }
+
+    public static void destroy() {
+        instance = null;
+    }
+
+    private final Int2ObjectOpenHashMap<Identifier> i2o = new Int2ObjectOpenHashMap<>();
+    private final Object2IntOpenHashMap<Identifier> o2i = new Object2IntOpenHashMap<>();
+
+    private int lastIntKey = 0;
+
+    @Override
+    public void register(Identifier stage) {
+        if (o2i.containsKey(stage)) {
+            i2o.remove(o2i.getInt(stage));
+        }
+        i2o.put(lastIntKey, stage);
+        o2i.put(stage, lastIntKey);
+        lastIntKey++;
+    }
+
+    public static boolean isRegistered(Identifier stage) {
+        return get().o2i.containsKey(stage);
+    }
+
+    public static int stage2int(Identifier stage) {
+        return get().o2i.getInt(stage);
+    }
+
+    public static Identifier int2stage(int i) {
+        return get().i2o.get(i);
+    }
+
+    public static Collection<Identifier> allStages() {
+        return get().o2i.keySet();
+    }
+
+    public static void syncRegistry(ServerPlayerEntity player) {
+        ServerPlayNetworking.send(player, StagesMod.BEGIN_SYNC_REGISTRY, new PacketByteBuf(Unpooled.buffer()));
+        get().o2i.forEach((stage, i) -> {
+            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+            buf.writeVarInt(i);
+            buf.writeIdentifier(stage);
+            ServerPlayNetworking.send(player, StagesMod.SYNC_REGISTRY, buf);
+        });
+        ServerPlayNetworking.send(player, StagesMod.END_SYNC_REGISTRY, new PacketByteBuf(Unpooled.buffer()));
+    }
+
+    @Environment(EnvType.CLIENT)
+    public static void syncRegistry(int i, Identifier stage) {
+        get().i2o.put(i, stage);
+        get().o2i.put(stage, i);
+    }
+
+}

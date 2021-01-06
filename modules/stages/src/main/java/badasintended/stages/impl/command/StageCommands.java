@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -163,7 +164,7 @@ public class StageCommands {
 
         Stages stages = Stages.get(player);
         int before = stages.values().size();
-        stages.addAll(Stages.allStages());
+        stages.addAll(StageRegistry.allStages());
         int after = stages.values().size();
         source.sendFeedback(new TranslatableText("command.stages.all.target", after - before), true);
         if (player != sender) {
@@ -194,7 +195,7 @@ public class StageCommands {
 
         @Override
         public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-            return CommandSource.suggestIdentifiers(Stages.allStages(), builder);
+            return CommandSource.suggestIdentifiers(StageRegistry.allStages(), builder);
         }
 
     }

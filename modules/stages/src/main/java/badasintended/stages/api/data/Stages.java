@@ -3,8 +3,6 @@ package badasintended.stages.api.data;
 import java.util.Collection;
 
 import badasintended.stages.impl.data.StageHolder;
-import badasintended.stages.impl.data.StagesImpl;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
@@ -17,9 +15,8 @@ import net.minecraft.util.Identifier;
  *     <li>All changes will automatically be synced to client</li>
  * </ul>
  *
- * @see Stages#register(Identifier...)
+ * @see StageRegistry#register(Identifier)
  */
-@SuppressWarnings({"BooleanMethodIsAlwaysInverted", "UnusedReturnValue", "unused"})
 public interface Stages {
 
     /**
@@ -28,46 +25,6 @@ public interface Stages {
     static Stages get(PlayerEntity player) {
         return ((StageHolder) player).stages$getStages();
     }
-
-    /**
-     * Register new stages.<br>
-     * Registry will be locked after {@link ServerLifecycleEvents#SERVER_STARTED} is called
-     * and further attempt will throw an {@link UnsupportedOperationException}.
-     */
-    static void register(Identifier... stages) {
-        StagesImpl.register(stages);
-    }
-
-    /**
-     * @return whether stage is registered
-     */
-    static boolean isRegistered(Identifier stage) {
-        return StagesImpl.isRegistered(stage);
-    }
-
-    /**
-     * Get stage from raw id. Useful for s2c syncing
-     */
-    static Identifier getStage(int i) {
-        return StagesImpl.int2stage(i);
-    }
-
-    /**
-     * Get raw id of a stage. Useful for s2c syncing
-     */
-    static int getRawId(Identifier stage) {
-        return StagesImpl.stage2int(stage);
-    }
-
-    /**
-     * Get all registered stages
-     */
-    static Collection<Identifier> allStages() {
-        return StagesImpl.allStages();
-    }
-
-
-    /* -------------------------------------------------------------------------------------------------------------------------------------------- */
 
 
     /**
@@ -93,12 +50,11 @@ public interface Stages {
     /**
      * Add new stage to player
      * <ul>
-     *     <li>All stages ids must be {@link #register(Identifier...) registered} first before it can be added to player</li>
+     *     <li>All stages ids must be {@link StageRegistry#register(Identifier) registered} first before it can be added to player</li>
      *     <li>Can only be performed on server</li>
      * </ul>
      */
     void add(Identifier stage);
-
 
     /**
      * Remove a stage from player
@@ -116,12 +72,14 @@ public interface Stages {
      */
     void clear();
 
+    /**
+     * Force s2c sync on next tick
+     */
+    void sync();
+
     void fromTag(CompoundTag tag);
 
     CompoundTag toTag(CompoundTag tag);
-
-
-    /* -------------------------------------------------------------------------------------------------------------------------------------------- */
 
 
     /**
@@ -175,7 +133,7 @@ public interface Stages {
     /**
      * Add new stages to player
      * <ul>
-     *     <li>All stages ids must be {@link #register(Identifier...) registered} first before it can be added to player</li>
+     *     <li>All stages ids must be {@link StageRegistry#register(Identifier) registered} first before it can be added to player</li>
      *     <li>Can only be performed on server</li>
      * </ul>
      */
@@ -188,7 +146,7 @@ public interface Stages {
     /**
      * Add new stages to player
      * <ul>
-     *     <li>All stages ids must be {@link #register(Identifier...) registered} first before it can be added to player</li>
+     *     <li>All stages ids must be {@link StageRegistry#register(Identifier) registered} first before it can be added to player</li>
      *     <li>Can only be performed on server</li>
      * </ul>
      */

@@ -1,12 +1,23 @@
 package badasintended.stages.api.event;
 
+import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.util.Identifier;
 
 import static net.fabricmc.fabric.api.event.EventFactory.createArrayBacked;
 
 public final class StageEvents {
+
+    /**
+     * Called on {@link ServerLifecycleEvents#SERVER_STARTING}, where you should register stages.
+     */
+    public static final Event<Registry> REGISTRY = createArrayBacked(Registry.class, callbacks -> registry -> {
+        for (Registry callback : callbacks) {
+            callback.onRegister(registry);
+        }
+    });
 
     /**
      * Called on {@link Stages#add(Identifier)} <b>before</b> a stage is added to a player.<br>
@@ -45,6 +56,13 @@ public final class StageEvents {
             callback.onChanged(stages);
         }
     });
+
+    @FunctionalInterface
+    public interface Registry {
+
+        void onRegister(StageRegistry registry);
+
+    }
 
     @FunctionalInterface
     public interface Add {

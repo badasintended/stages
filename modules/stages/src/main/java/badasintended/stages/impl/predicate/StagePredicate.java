@@ -2,6 +2,7 @@ package badasintended.stages.impl.predicate;
 
 import java.util.Set;
 
+import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -39,7 +40,7 @@ public class StagePredicate {
             JsonObject jsonStages = JsonHelper.asObject(json, "stages");
             jsonStages.entrySet().forEach(entry -> {
                 Identifier stage = new Identifier(entry.getKey());
-                if (!Stages.isRegistered(stage)) {
+                if (!StageRegistry.isRegistered(stage)) {
                     throw new JsonParseException("Unregistered stage " + stage);
                 }
                 if (JsonHelper.asBoolean(entry.getValue(), "stage")) {

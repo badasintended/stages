@@ -12,18 +12,14 @@
   "icon"         : "assets/itemstages/icon.png",
   "environment"  : "*",
   "entrypoints"  : {
-    "stages:main"  : ["badasintended.itemstages.ItemStages"],
-    "stages:client": ["badasintended.itemstages.ItemStagesClient"],
-    "rei_plugins"  : ["badasintended.itemstages.ItemStagesReiPlugin"]
+    "stages:main": ["badasintended.itemstages.ItemStages"],
+    "rei_plugins": ["badasintended.itemstages.ItemStagesReiPlugin"]
   },
   "mixins"       : ["itemstages.mixins.json"],
   "depends"      : {
-    "fabricloader": ">=0.7.4",
-    "fabric"      : "*",
-    "minecraft"   : "*",
-    "stages"      : "*"
+    "stages": "*"
   },
   "custom"       : {
-    "modmenu:api": true
+    "modmenu:parent": "stages"
   }
 }
