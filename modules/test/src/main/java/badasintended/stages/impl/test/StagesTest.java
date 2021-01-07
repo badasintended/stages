@@ -30,18 +30,22 @@ public class StagesTest implements StagesInit {
             registry.register(A, B, C, D, E)
         );
 
-        StageEvents.CHANGED.register(stages ->
-            LOGGER.info("changed {}", stages.getPlayer().getDisplayName().getString())
-        );
-
         StageEvents.ADD.register((stages, stage) -> {
             LOGGER.info("add    : {}, {}", stages.getPlayer().getDisplayName().getString(), stage);
             return true;
         });
 
+        StageEvents.ADDED.register((stages, stage) -> {
+            LOGGER.info("added  : {}, {}", stages.getPlayer().getDisplayName().getString(), stage);
+        });
+
         StageEvents.REMOVE.register((stages, stage) -> {
             LOGGER.info("remove : {}, {}", stages.getPlayer().getDisplayName().getString(), stage);
             return true;
+        });
+
+        StageEvents.REMOVED.register((stages, stage) -> {
+            LOGGER.info("removed: {}, {}", stages.getPlayer().getDisplayName().getString(), stage);
         });
     }
 

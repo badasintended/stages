@@ -1,0 +1,22 @@
+{
+  "required"          : true,
+  "minVersion"        : "0.8",
+  "package"           : "badasintended.blockstages.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins"            : [
+    "AbstractBlockStateMixin",
+    "PlayerEntityMixin",
+    "ServerPlayerInteractionManagerMixin"
+  ],
+  "client"            : [
+    "client.AbstractBlockStateMixin",
+    "client.BlockDustParticleMixin",
+    "client.ChunkRendererRegionMixin",
+    "client.DebugHudMixin",
+    "waila.DataAccessorMixin",
+    "waila.RayTracingMixin"
+  ],
+  "injectors"         : {
+    "defaultRequire": 1
+  }
+}

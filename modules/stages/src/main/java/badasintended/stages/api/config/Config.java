@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.InvalidParameterException;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,7 +33,7 @@ public final class Config<T> {
      * @param synced      whether this config should be synced to client
      */
     public static <T> Config<T> create(Class<T> configClass, String name, boolean synced) {
-        return create(configClass, name, synced, gsonBuilder -> gsonBuilder);
+        return create(configClass, name, synced, gsonBuilder -> {});
     }
 
     /**
@@ -44,7 +44,7 @@ public final class Config<T> {
      * @param synced      whether this config should be synced to client
      * @param gson        <b>do not call {@link GsonBuilder#setPrettyPrinting()}</b>
      */
-    public static <T> Config<T> create(Class<T> configClass, String name, boolean synced, Function<GsonBuilder, GsonBuilder> gson) {
+    public static <T> Config<T> create(Class<T> configClass, String name, boolean synced, Consumer<GsonBuilder> gson) {
         if (CONFIGS.containsKey(name)) {
             throw new InvalidParameterException("Config with name " + name + " is already present!");
         } else {
@@ -76,12 +76,16 @@ public final class Config<T> {
 
     private T config = null;
 
-    private Config(Class<T> configClass, String name, boolean synced, Function<GsonBuilder, GsonBuilder> gson) {
+    private Config(Class<T> configClass, String name, boolean synced, Consumer<GsonBuilder> gson) {
         this.configClass = configClass;
         this.path = CONFIG_PATH.resolve(name + ".json").toAbsolutePath();
         this.synced = synced;
-        this.uglyGson = gson.apply(createGsonBuilder()).create();
-        this.prettyGson = gson.apply(createGsonBuilder().setPrettyPrinting()).create();
+        GsonBuilder ugly = createGsonBuilder();
+        GsonBuilder pretty = createGsonBuilder().setPrettyPrinting();
+        gson.accept(ugly);
+        gson.accept(pretty);
+        this.uglyGson = ugly.create();
+        this.prettyGson = pretty.create();
     }
 
     /**

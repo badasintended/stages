@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import badasintended.stages.api.config.Config;
-import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.impl.StagesMod;
 import badasintended.stages.impl.data.StageRegistryImpl;
@@ -35,10 +34,8 @@ public abstract class MinecraftServerMixin {
     @Inject(method = "reloadResources", at = @At("HEAD"))
     private void reloadResources(Collection<String> datapacks, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
         reload();
-        this.playerManager.getPlayerList().forEach(it -> {
-            StagesMod.sync(it);
-            Stages.get(it).sync();
-        });
+        this.playerManager.getPlayerList().forEach(StagesMod::sync);
+        StageEvents.REGISTRY_RELOADED.invoker().onRegistryReloaded((MinecraftServer) (Object) this);
         StagesMod.LOGGER.info("[stages] Registry and config resynced");
     }
 

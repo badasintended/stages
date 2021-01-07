@@ -4,15 +4,14 @@ import java.util.Collection;
 
 import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.impl.StagesMod;
-import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+
+import static badasintended.stages.api.StagesUtil.s2c;
 
 public class StageRegistryImpl implements StageRegistry {
 
@@ -61,14 +60,12 @@ public class StageRegistryImpl implements StageRegistry {
     }
 
     public static void syncRegistry(ServerPlayerEntity player) {
-        ServerPlayNetworking.send(player, StagesMod.BEGIN_SYNC_REGISTRY, new PacketByteBuf(Unpooled.buffer()));
-        get().o2i.forEach((stage, i) -> {
-            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        s2c(player, StagesMod.BEGIN_SYNC_REGISTRY, buf -> {});
+        get().o2i.forEach((stage, i) -> s2c(player, StagesMod.SYNC_REGISTRY, buf -> {
             buf.writeVarInt(i);
             buf.writeIdentifier(stage);
-            ServerPlayNetworking.send(player, StagesMod.SYNC_REGISTRY, buf);
-        });
-        ServerPlayNetworking.send(player, StagesMod.END_SYNC_REGISTRY, new PacketByteBuf(Unpooled.buffer()));
+        }));
+        s2c(player, StagesMod.END_SYNC_REGISTRY, buf -> {});
     }
 
     @Environment(EnvType.CLIENT)

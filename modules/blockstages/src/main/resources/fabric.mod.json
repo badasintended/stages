@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id"           : "itemstages",
+  "id"           : "blockstages",
   "version"      : "${version}",
   "authors"      : ["deirn"],
   "contact"      : {
@@ -9,14 +9,13 @@
     "issues"  : "https://github.com/badasintended/stages/issues"
   },
   "license"      : "LGPL-2.1",
-  "icon"         : "assets/itemstages/icon.png",
+  "icon"         : "assets/blockstages/icon.png",
   "environment"  : "*",
   "entrypoints"  : {
-    "stages:main"  : ["badasintended.itemstages.ItemStages"],
-    "stages:client": ["badasintended.itemstages.ItemStagesClient"],
-    "rei_plugins"  : ["badasintended.itemstages.ItemStagesReiPlugin"]
+    "stages:main"  : ["badasintended.blockstages.BlockStages"],
+    "stages:client": ["badasintended.blockstages.BlockStagesClient"]
   },
-  "mixins"       : ["itemstages.mixins.json"],
+  "mixins"       : ["blockstages.mixins.json"],
   "depends"      : {
     "stages": "*"
   },

@@ -1,0 +1,9 @@
+repositories {
+    maven { url "https://maven.tehnut.info" }
+}
+
+moduleDep(project, "stages")
+
+dependencies {
+    modImplementation("mcp.mobius.waila:Hwyla:${hwyla}") { transitive = false }
+}

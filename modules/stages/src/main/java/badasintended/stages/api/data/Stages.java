@@ -72,11 +72,6 @@ public interface Stages {
      */
     void clear();
 
-    /**
-     * Force s2c sync on next tick
-     */
-    void sync();
-
     void fromTag(CompoundTag tag);
 
     CompoundTag toTag(CompoundTag tag);

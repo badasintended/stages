@@ -1,25 +1,27 @@
 package badasintended.stages.impl;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import badasintended.stages.api.StagesUtil;
 import badasintended.stages.api.config.Config;
+import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
 import badasintended.stages.impl.advancement.criterion.StagesChangedCriterion;
 import badasintended.stages.impl.command.StageCommands;
 import badasintended.stages.impl.data.StageRegistryImpl;
-import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.advancement.CriterionRegistry;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static badasintended.stages.api.StagesUtil.s2c;
 
 public class StagesMod implements ModInitializer {
 
@@ -31,7 +33,9 @@ public class StagesMod implements ModInitializer {
         BEGIN_SYNC_REGISTRY = StagesUtil.id("begin_sync_registry"),
         SYNC_REGISTRY       = StagesUtil.id("sync_registry"),
         END_SYNC_REGISTRY   = StagesUtil.id("end_sync_registry"),
-        SYNC_STAGES         = StagesUtil.id("sync_stages"),
+        SYNC_STAGE_ADDED    = StagesUtil.id("sync_stage_added"),
+        SYNC_STAGE_REMOVED  = StagesUtil.id("sync_stage_removed"),
+        SYNC_STAGE_CHANGED  = StagesUtil.id("sync_stage_changed"),
         SYNC_CONFIG         = StagesUtil.id("sync_config");
     // @formatter:on
 
@@ -39,12 +43,17 @@ public class StagesMod implements ModInitializer {
         StageRegistryImpl.syncRegistry(player);
         Config.CONFIGS.forEach((name, config) -> {
             if (config.isSynced()) {
-                PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-                buf.writeString(name);
-                buf.writeByteArray(config.toJson().getBytes(StandardCharsets.UTF_8));
-                ServerPlayNetworking.send(player, SYNC_CONFIG, buf);
+                s2c(player, SYNC_CONFIG, buf -> {
+                    buf.writeString(name);
+                    buf.writeByteArray(config.toJson().getBytes(StandardCharsets.UTF_8));
+                });
             }
         });
+
+        Stages stages = Stages.get(player);
+        Set<Identifier> values = new ObjectOpenHashSet<>(stages.values());
+        stages.clear();
+        values.forEach(stages::add);
     }
 
     @Override

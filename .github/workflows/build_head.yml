@@ -34,12 +34,16 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: stages ${{ steps.vars.outputs.HASH }}
-          path: "./modules/stages/build/libs/**.jar"
+          path: "./bin/jar/stages/**.jar"
       - uses: actions/upload-artifact@v2
         with:
           name: itemstages ${{ steps.vars.outputs.HASH }}
-          path: "./modules/itemstages/build/libs/**.jar"
+          path: "./bin/jar/itemstages/**.jar"
+      - uses: actions/upload-artifact@v2
+        with:
+          name: blockstages ${{ steps.vars.outputs.HASH }}
+          path: "./bin/jar/blockstages/**.jar"
       - uses: actions/upload-artifact@v2
         with:
           name: test ${{ steps.vars.outputs.HASH }}
-          path: "./modules/test/build/libs/**.jar"
+          path: "./bin/jar/test/**.jar"

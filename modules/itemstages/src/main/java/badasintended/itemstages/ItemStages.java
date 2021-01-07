@@ -10,6 +10,7 @@ import badasintended.stages.api.init.StagesInit;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -19,6 +20,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
+
+import static badasintended.stages.api.StagesUtil.id;
+import static badasintended.stages.api.StagesUtil.s2c;
 
 public class ItemStages implements StagesInit {
 
@@ -31,6 +35,8 @@ public class ItemStages implements StagesInit {
     );
 
     public static final CompoundTag EMPTY_TAG = new CompoundTag();
+
+    public static final Identifier INITIALIZE = id("item/init");
 
     @Environment(EnvType.CLIENT)
     public static boolean isLocked(ItemStack stack) {
@@ -48,6 +54,13 @@ public class ItemStages implements StagesInit {
             }
         }
         return false;
+    }
+
+    public static void init(PlayerEntity player) {
+        Map<Identifier, ItemStagesConfig.Entry> entries = CONFIG.get().entries;
+        Map<Item, Set<CompoundTag>> locked = ((ItemStagesHolder) player).stages$getLockedItems();
+        locked.clear();
+        entries.forEach((id, entry) -> editLockedItems(Stages.get(player), id));
     }
 
     public static void editLockedItems(Stages stages, Identifier stage) {
@@ -91,10 +104,17 @@ public class ItemStages implements StagesInit {
             registry.register(CONFIG.get().entries.keySet())
         );
 
-        StageEvents.CHANGED.register(stages -> {
-            Map<Identifier, ItemStagesConfig.Entry> entries = CONFIG.get().entries;
-            entries.forEach((id, entry) -> editLockedItems(stages, id));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            init(handler.player);
+            s2c(handler.player, INITIALIZE, buf -> {});
         });
+
+        StageEvents.ADDED.register(ItemStages::editLockedItems);
+        StageEvents.REMOVED.register(ItemStages::editLockedItems);
+        StageEvents.REGISTRY_RELOADED.register(server -> server.getPlayerManager().getPlayerList().forEach(player -> {
+            init(player);
+            s2c(player, INITIALIZE, buf -> {});
+        }));
     }
 
 }

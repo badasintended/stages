@@ -29,12 +29,7 @@ project(":modules").subprojects {
     version = "${rootProject.getProperties().get(name)}"
     if (!release) version += "+${gitHash}"
 
-    sourceSets {
-        testmod {
-            compileClasspath += main.compileClasspath
-            runtimeClasspath += main.runtimeClasspath
-        }
-    }
+    def binDir = "../../bin/jar/${name}"
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft}"
@@ -42,13 +37,21 @@ project(":modules").subprojects {
         modImplementation "net.fabricmc:fabric-loader:${rootProject.loader}"
 
         modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric}"
-
-        testmodImplementation sourceSets.main.output
     }
 
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
         from sourceSets.main.allSource
+    }
+
+    task copyJarToBin(type: Copy) {
+        from remapJar
+        from remapSourcesJar
+        into binDir
+    }
+
+    task clearBin(type: Delete) {
+        delete binDir
     }
 
     afterEvaluate {
@@ -98,4 +101,7 @@ project(":modules").subprojects {
             }
         }
     }
+
+    clean.dependsOn clearBin
+    build.finalizedBy copyJarToBin
 }

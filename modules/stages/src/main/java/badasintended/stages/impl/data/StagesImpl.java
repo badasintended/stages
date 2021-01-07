@@ -1,36 +1,31 @@
 package badasintended.stages.impl.data;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.impl.StagesMod;
-import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Tickable;
+
+import static badasintended.stages.api.StagesUtil.s2c;
 
 public class StagesImpl implements Stages, Tickable {
 
     private static final String TAG_NAME = "Stages";
-
-
-    // --------------------------------------------------------------------------------------------
-
 
     private final ObjectSet<Identifier> stages = new ObjectOpenHashSet<>();
     private final ObjectSet<Identifier> immutableStages = ObjectSets.unmodifiable(stages);
@@ -78,6 +73,12 @@ public class StagesImpl implements Stages, Tickable {
             StagesMod.LOGGER.error("[stages] Attempting to add unregistered stage id {}", stage);
         } else if (StageEvents.ADD.invoker().onAdd(this, stage)) {
             stages.add(stage);
+            if (!isClient) {
+                StageEvents.ADDED.invoker().onAdded(this, stage);
+                s2c(player, StagesMod.SYNC_STAGE_ADDED, buf ->
+                    buf.writeVarInt(StageRegistry.getRawId(stage))
+                );
+            }
             changed = true;
         }
     }
@@ -89,6 +90,12 @@ public class StagesImpl implements Stages, Tickable {
             StagesMod.LOGGER.error("[stages] Attempting to remove unregistered stage id {}", stage);
         } else if (StageEvents.REMOVE.invoker().onRemove(this, stage)) {
             stages.remove(stage);
+            if (!isClient) {
+                StageEvents.REMOVED.invoker().onRemoved(this, stage);
+                s2c(player, StagesMod.SYNC_STAGE_REMOVED, buf ->
+                    buf.writeVarInt(StageRegistry.getRawId(stage))
+                );
+            }
             changed = true;
         }
     }
@@ -96,13 +103,18 @@ public class StagesImpl implements Stages, Tickable {
     @Override
     public void clear() {
         assertServerSide();
-        stages.clear();
-        changed = true;
-    }
-
-    @Override
-    public void sync() {
-        changed = true;
+        Iterator<Identifier> iterator = stages.iterator();
+        while (iterator.hasNext()) {
+            Identifier stage = iterator.next();
+            iterator.remove();
+            if (!isClient) {
+                StageEvents.REMOVED.invoker().onRemoved(this, stage);
+                s2c(player, StagesMod.SYNC_STAGE_REMOVED, buf ->
+                    buf.writeVarInt(StageRegistry.getRawId(stage))
+                );
+            }
+            changed = true;
+        }
     }
 
     @Override
@@ -127,21 +139,29 @@ public class StagesImpl implements Stages, Tickable {
             StageEvents.CHANGED.invoker().onChanged(this);
             changed = false;
             if (!isClient) {
-                PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-                buf.writeVarInt(stages.size());
-                stages.forEach(s -> buf.writeVarInt(StageRegistry.getRawId(s)));
-
-                ServerPlayNetworking.send((ServerPlayerEntity) player, StagesMod.SYNC_STAGES, buf);
+                s2c(player, StagesMod.SYNC_STAGE_CHANGED, buf -> {});
             }
         }
     }
 
     @Environment(EnvType.CLIENT)
-    public void sync(int[] stageIds) {
-        stages.clear();
-        for (int stageId : stageIds) {
-            stages.add(StageRegistry.getStage(stageId));
-        }
+    public void syncAdd(int stageId) {
+        Identifier stage = StageRegistry.getStage(stageId);
+        stages.add(stage);
+        StageEvents.ADDED.invoker().onAdded(this, stage);
+
+    }
+
+    @Environment(EnvType.CLIENT)
+    public void syncRemove(int stageId) {
+        Identifier stage = StageRegistry.getStage(stageId);
+        stages.remove(stage);
+        StageEvents.REMOVED.invoker().onRemoved(this, stage);
+
+    }
+
+    @Environment(EnvType.CLIENT)
+    public void syncChanged() {
         changed = true;
     }
 

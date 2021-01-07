@@ -9,6 +9,7 @@ pluginManagement {
     }
 }
 
+include 'modules:blockstages'
 include 'modules:itemstages'
 include 'modules:stages'
 include 'modules:test'
