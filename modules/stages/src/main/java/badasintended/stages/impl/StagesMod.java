@@ -4,12 +4,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import badasintended.stages.api.StagesUtil;
-import badasintended.stages.api.config.Config;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
 import badasintended.stages.impl.advancement.criterion.StagesChangedCriterion;
 import badasintended.stages.impl.command.StageCommands;
+import badasintended.stages.impl.config.ConfigHolderImpl;
 import badasintended.stages.impl.data.StageRegistryImpl;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.api.ModInitializer;
@@ -41,7 +41,7 @@ public class StagesMod implements ModInitializer {
 
     public static void sync(ServerPlayerEntity player) {
         StageRegistryImpl.syncRegistry(player);
-        Config.CONFIGS.forEach((name, config) -> {
+        ConfigHolderImpl.CONFIGS.forEach((name, config) -> {
             if (config.isSynced()) {
                 s2c(player, SYNC_CONFIG, buf -> {
                     buf.writeString(name);

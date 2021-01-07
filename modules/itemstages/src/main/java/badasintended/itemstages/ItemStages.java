@@ -3,7 +3,7 @@ package badasintended.itemstages;
 import java.util.Map;
 import java.util.Set;
 
-import badasintended.stages.api.config.Config;
+import badasintended.stages.api.config.ConfigHolder;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
@@ -28,7 +28,7 @@ public class ItemStages implements StagesInit {
 
     public static final Item UNKNOWN_ITEM = new Item(new Item.Settings());
 
-    public static final Config<ItemStagesConfig> CONFIG = Config.create(
+    public static final ConfigHolder<ItemStagesConfig> CONFIG = ConfigHolder.create(
         ItemStagesConfig.class, "item", true, gson -> gson
             .registerTypeAdapter(Identifier.class, new ItemStagesConfig.IdentifierAdapter())
             .registerTypeAdapter(ItemStagesConfig.Entry.class, new ItemStagesConfig.Entry.Adapter())

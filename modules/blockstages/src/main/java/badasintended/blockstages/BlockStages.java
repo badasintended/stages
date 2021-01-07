@@ -2,7 +2,7 @@ package badasintended.blockstages;
 
 import java.util.Map;
 
-import badasintended.stages.api.config.Config;
+import badasintended.stages.api.config.ConfigHolder;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
@@ -24,7 +24,7 @@ public class BlockStages implements StagesInit {
 
     public static final Identifier INITIALIZE = id("block/init");
 
-    public static final Config<BlockStagesConfig> CONFIG = Config.create(
+    public static final ConfigHolder<BlockStagesConfig> CONFIG = ConfigHolder.create(
         BlockStagesConfig.class, "block", true, gson -> gson
             .registerTypeAdapter(Identifier.class, new BlockStagesConfig.IdentifierAdapter())
             .registerTypeAdapter(BlockStagesConfig.Entry.class, new BlockStagesConfig.Entry.Adapter())

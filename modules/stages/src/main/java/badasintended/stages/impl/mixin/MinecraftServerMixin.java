@@ -3,9 +3,10 @@ package badasintended.stages.impl.mixin;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import badasintended.stages.api.config.Config;
+import badasintended.stages.api.config.ConfigHolder;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.impl.StagesMod;
+import badasintended.stages.impl.config.ConfigHolderImpl;
 import badasintended.stages.impl.data.StageRegistryImpl;
 import net.minecraft.resource.DataPackSettings;
 import net.minecraft.resource.ResourcePackManager;
@@ -41,7 +42,7 @@ public abstract class MinecraftServerMixin {
 
     @Unique
     private static void reload() {
-        Config.CONFIGS.values().forEach(Config::destroy);
+        ConfigHolderImpl.CONFIGS.values().forEach(ConfigHolder::destroy);
         StageRegistryImpl.destroy();
         StageEvents.REGISTRY.invoker().onRegister(StageRegistryImpl.get());
         StagesMod.LOGGER.info("[stages] Config destroyed and registry reloaded");

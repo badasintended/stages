@@ -2,10 +2,10 @@ package badasintended.stages.impl;
 
 import java.nio.charset.StandardCharsets;
 
-import badasintended.stages.api.config.Config;
 import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.init.ClientStagesInit;
+import badasintended.stages.impl.config.ConfigHolderImpl;
 import badasintended.stages.impl.data.StageRegistryImpl;
 import badasintended.stages.impl.data.StagesImpl;
 import net.fabricmc.api.ClientModInitializer;
@@ -36,7 +36,7 @@ public class StagesModClient implements ClientModInitializer {
             String json = new String(buf.readByteArray(), StandardCharsets.UTF_8);
 
             client.execute(() -> {
-                Config.CONFIGS.get(name).fromJson(json);
+                ConfigHolderImpl.CONFIGS.get(name).fromJson(json);
                 LOGGER.info("[stages] Synced config \"{}\"", name);
             });
         });
