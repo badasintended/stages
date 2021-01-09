@@ -13,6 +13,7 @@
     "client.BlockDustParticleMixin",
     "client.ChunkRendererRegionMixin",
     "client.DebugHudMixin",
+    "client.MinecraftClientMixin",
     "waila.DataAccessorMixin",
     "waila.RayTracingMixin"
   ],
