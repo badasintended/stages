@@ -6,6 +6,7 @@ import badasintended.stages.api.config.ConfigHolder;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
+import com.google.gson.GsonBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -24,10 +25,13 @@ public class BlockStages implements StagesInit {
 
     public static final Identifier INITIALIZE = id("block/init");
 
-    public static final ConfigHolder<BlockStagesConfig> CONFIG = ConfigHolder.create(
-        BlockStagesConfig.class, "block", true, gson -> gson
-            .registerTypeAdapter(Identifier.class, new BlockStagesConfig.IdentifierAdapter())
+    public static final ConfigHolder<BlockStagesConfig> CONFIG = ConfigHolder.of(
+        BlockStagesConfig.class, "block", new GsonBuilder()
             .registerTypeAdapter(BlockStagesConfig.Entry.class, new BlockStagesConfig.Entry.Adapter())
+            .registerTypeAdapter(Identifier.class, new BlockStagesConfig.IdentifierAdapter())
+            .enableComplexMapKeySerialization()
+            .setPrettyPrinting()
+            .create()
     );
 
     public static BlockState getFakeBlockState(@Nullable PlayerEntity player, BlockState state) {

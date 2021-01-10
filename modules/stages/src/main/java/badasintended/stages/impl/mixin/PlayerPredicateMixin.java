@@ -41,7 +41,7 @@ public abstract class PlayerPredicateMixin implements StagePredicateHolder {
 
     @Inject(
         method = "toJson",
-        at = @At(value = "INVOKE", ordinal = 0, target = "Lcom/google/gson/JsonObject;add(Ljava/lang/String;Lcom/google/gson/JsonElement;)V"),
+        at = @At(value = "INVOKE", ordinal = 0, target = "Lcom/google/gson/JsonObject;add(Ljava/lang/String;Lcom/google/gson/JsonElement;)V", remap = false),
         locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void addStagePredicateToJson(CallbackInfoReturnable<JsonElement> cir, JsonObject jsonObject) {

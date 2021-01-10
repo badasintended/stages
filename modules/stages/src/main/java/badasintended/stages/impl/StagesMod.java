@@ -1,9 +1,9 @@
 package badasintended.stages.impl;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import badasintended.stages.api.StagesUtil;
+import badasintended.stages.api.config.SyncedConfig;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
@@ -45,7 +45,8 @@ public class StagesMod implements ModInitializer {
             if (config.isSynced()) {
                 s2c(player, SYNC_CONFIG, buf -> {
                     buf.writeString(name);
-                    buf.writeByteArray(config.toJson().getBytes(StandardCharsets.UTF_8));
+                    buf.writeString(config.get().getClass().getName());
+                    ((SyncedConfig) config.get()).toBuf(buf);
                 });
             }
         });

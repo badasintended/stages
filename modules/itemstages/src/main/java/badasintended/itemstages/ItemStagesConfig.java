@@ -4,6 +4,7 @@ package badasintended.itemstages;
 import java.io.IOException;
 import java.util.Map;
 
+import badasintended.stages.api.config.SyncedConfig;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
@@ -15,19 +16,42 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public class ItemStagesConfig {
+public class ItemStagesConfig implements SyncedConfig {
 
     public final Settings settings = new Settings();
     public final Map<Identifier, Entry> entries = new Object2ObjectOpenHashMap<>();
 
-    public static class Settings {
+    @Override
+    public void toBuf(PacketByteBuf buf) {
+        settings.toBuf(buf);
+        buf.writeVarInt(entries.size());
+        entries.forEach((key, value) -> {
+            buf.writeIdentifier(key);
+            value.toBuf(buf);
+        });
+    }
+
+    @Override
+    public void fromBuf(PacketByteBuf buf) {
+        settings.fromBuf(buf);
+        entries.clear();
+        int size = buf.readVarInt();
+        for (int i = 0; i < size; i++) {
+            Entry entry = new Entry();
+            entries.put(buf.readIdentifier(), entry);
+            entry.fromBuf(buf);
+        }
+    }
+
+    public static class Settings implements SyncedConfig {
 
         // @formatter:off
-        public final boolean
+        public boolean
             dropWhenOnHand     = true,
             dropWhenOnCursor   = true,
             changeModel        = true,
@@ -36,20 +60,56 @@ public class ItemStagesConfig {
             hideFromRei        = true;
         // @formatter:on
 
+        @Override
+        public void toBuf(PacketByteBuf buf) {
+            buf.writeBoolean(dropWhenOnHand);
+            buf.writeBoolean(dropWhenOnCursor);
+            buf.writeBoolean(changeModel);
+            buf.writeBoolean(hideTooltip);
+            buf.writeBoolean(preventToInventory);
+            buf.writeBoolean(hideFromRei);
+        }
+
+        @Override
+        public void fromBuf(PacketByteBuf buf) {
+            dropWhenOnHand = buf.readBoolean();
+            dropWhenOnCursor = buf.readBoolean();
+            changeModel = buf.readBoolean();
+            hideTooltip = buf.readBoolean();
+            preventToInventory = buf.readBoolean();
+            hideFromRei = buf.readBoolean();
+        }
+
     }
 
-    public static class Entry {
+    public static class Entry implements SyncedConfig {
 
-        public final Item item;
-        public final Tag.Identified<Item> tag;
-        public final CompoundTag nbt;
-        public final String name;
+        public Item item = Items.AIR;
+        public Tag.Identified<Item> tag = null;
+        public CompoundTag nbt = ItemStages.EMPTY_TAG;
+        public String name = "";
 
-        public Entry(Item item, Tag.Identified<Item> tag, CompoundTag nbt, String name) {
-            this.item = item;
-            this.tag = tag;
-            this.nbt = nbt;
-            this.name = name;
+        @Override
+        public void toBuf(PacketByteBuf buf) {
+            buf.writeVarInt(Registry.ITEM.getRawId(item));
+            buf.writeBoolean(tag != null);
+            if (tag != null) {
+                buf.writeIdentifier(tag.getId());
+            }
+            buf.writeCompoundTag(nbt);
+            buf.writeByteArray(name.getBytes());
+        }
+
+        @Override
+        public void fromBuf(PacketByteBuf buf) {
+            item = Registry.ITEM.get(buf.readVarInt());
+            if (buf.readBoolean()) {
+                tag = (Tag.Identified<Item>) TagRegistry.item(buf.readIdentifier());
+            } else {
+                tag = null;
+            }
+            nbt = buf.readCompoundTag();
+            name = new String(buf.readByteArray());
         }
 
         public static class Adapter extends TypeAdapter<Entry> {
@@ -97,7 +157,13 @@ public class ItemStagesConfig {
                     item = Registry.ITEM.get(new Identifier(id));
                 }
 
-                return new Entry(item, tag, nbt, name);
+                Entry entry = new Entry();
+                entry.item = item;
+                entry.tag = tag;
+                entry.nbt = nbt;
+                entry.name = name;
+
+                return entry;
             }
 
             @Override

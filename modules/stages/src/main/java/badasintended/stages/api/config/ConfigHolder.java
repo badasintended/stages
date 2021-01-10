@@ -1,40 +1,43 @@
 package badasintended.stages.api.config;
 
-import java.util.function.Consumer;
-
 import badasintended.stages.impl.config.ConfigHolderImpl;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
- * Config holder with optional s2c syncing
- * <ul>
- *     <li>Config will be {@link #destroy() destroyed} on datapack load/reload</li>
- *     <li>Config Gson's {@link GsonBuilder#enableComplexMapKeySerialization() complexMapKeySerialization} is enabled</li>
- * </ul>
+ * Config holder with optional s2c syncing.<br>
+ * Config will be {@link #destroy() destroyed} on datapack load/reload.
+ *
+ * @see SyncedConfig
  */
 public interface ConfigHolder<T> {
 
     /**
-     * Create new config with default gson<br>
-     *
-     * @param configClass must have a constructor with empty parameter
-     * @param name        Config json can be located on {@code .minecraft/config/stages/<name>.json}
-     * @param synced      whether this config should be synced to client
+     * A fairly basic GSON.
      */
-    static <T> ConfigHolder<T> create(Class<T> configClass, String name, boolean synced) {
-        return create(configClass, name, synced, gsonBuilder -> {});
+    Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    /**
+     * Create new config holder with default gson.
+     *
+     * @param clazz must have a constructor with empty parameter.
+     *              <b>implement {@link SyncedConfig} to make it synced to client</b>
+     * @param name  config json can be located on {@code .minecraft/config/stages/<name>.json}
+     */
+    static <T> ConfigHolder<T> of(Class<T> clazz, String name) {
+        return of(clazz, name, GSON);
     }
 
     /**
-     * Create new config with custom gson<br>
+     * Create new config holder with custom gson.
      *
-     * @param configClass must have a constructor with empty parameter
-     * @param name        Config json can be located on {@code .minecraft/config/stages/<name>.json}
-     * @param synced      whether this config should be synced to client
-     * @param gson        <b>do not call {@link GsonBuilder#setPrettyPrinting()}</b>
+     * @param clazz must have a constructor with empty parameter.
+     *              <b>implement {@link SyncedConfig} to make it synced to client</b>
+     * @param name  config json can be located on {@code .minecraft/config/stages/<name>.json}
+     * @param gson  custom gson that will be used for (de)serializing
      */
-    static <T> ConfigHolder<T> create(Class<T> configClass, String name, boolean synced, Consumer<GsonBuilder> gson) {
-        return ConfigHolderImpl.create(configClass, name, synced, gson);
+    static <T> ConfigHolder<T> of(Class<T> clazz, String name, Gson gson) {
+        return ConfigHolderImpl.create(clazz, name, gson);
     }
 
 
@@ -55,14 +58,8 @@ public interface ConfigHolder<T> {
     void destroy();
 
     /**
-     * Try to save config to json file
+     * Try to save config to json file.
      */
     void save();
-
-    String toJson();
-
-    String toPrettyJson();
-
-    void fromJson(String json);
 
 }

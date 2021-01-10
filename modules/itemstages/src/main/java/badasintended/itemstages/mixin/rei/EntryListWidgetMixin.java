@@ -5,10 +5,12 @@ import me.shedaniel.rei.api.EntryStack;
 import me.shedaniel.rei.gui.widget.EntryListWidget;
 import me.shedaniel.rei.gui.widget.WidgetWithBounds;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+@Pseudo
 @Mixin(value = EntryListWidget.class, remap = false)
 public abstract class EntryListWidgetMixin extends WidgetWithBounds {
 

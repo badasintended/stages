@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import badasintended.stages.api.StagesUtil;
 import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -16,8 +17,10 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.argument.ArgumentTypes;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
+import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -38,6 +41,7 @@ public class StageCommands {
     // @formatter:on
 
     public static void register() {
+        ArgumentTypes.register(StagesUtil.MOD_ID + ":arg", StageArgumentType.class, new ConstantArgumentSerializer<>(StageArgumentType::new));
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> dispatcher.register(
             literal("stage")
                 .then(silent("add", 2, (context, silent) -> edit(context, silent, true)))

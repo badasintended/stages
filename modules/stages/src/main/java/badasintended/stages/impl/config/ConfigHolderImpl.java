@@ -5,11 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.InvalidParameterException;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import badasintended.stages.api.config.ConfigHolder;
+import badasintended.stages.api.config.SyncedConfig;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -18,16 +17,11 @@ public class ConfigHolderImpl<T> implements ConfigHolder<T> {
     public static final Map<String, ConfigHolder<?>> CONFIGS = new Object2ObjectOpenHashMap<>();
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("stages").toAbsolutePath();
 
-    private static GsonBuilder createGsonBuilder() {
-        return new GsonBuilder()
-            .enableComplexMapKeySerialization();
-    }
-
-    public static <T> ConfigHolder<T> create(Class<T> configClass, String name, boolean synced, Consumer<GsonBuilder> gson) {
+    public static <T> ConfigHolder<T> create(Class<T> configClass, String name, Gson gson) {
         if (ConfigHolderImpl.CONFIGS.containsKey(name)) {
             throw new InvalidParameterException("Config with name " + name + " is already present!");
         } else {
-            ConfigHolder<T> config = new ConfigHolderImpl<>(configClass, name, synced, gson);
+            ConfigHolder<T> config = new ConfigHolderImpl<>(configClass, name, gson);
             CONFIGS.put(name, config);
             return config;
         }
@@ -42,24 +36,23 @@ public class ConfigHolderImpl<T> implements ConfigHolder<T> {
     }
 
 
-    private final Class<T> configClass;
+    private final Class<T> clazz;
     private final Path path;
+    private final Gson gson;
     private final boolean synced;
-    private final Gson uglyGson;
-    private final Gson prettyGson;
 
     private T config = null;
 
-    public ConfigHolderImpl(Class<T> configClass, String name, boolean synced, Consumer<GsonBuilder> gson) {
-        this.configClass = configClass;
+    private ConfigHolderImpl(Class<T> clazz, String name, Gson gson) {
+        this.clazz = clazz;
         this.path = CONFIG_PATH.resolve(name + ".json").toAbsolutePath();
-        this.synced = synced;
-        GsonBuilder ugly = createGsonBuilder();
-        GsonBuilder pretty = createGsonBuilder().setPrettyPrinting();
-        gson.accept(ugly);
-        gson.accept(pretty);
-        this.uglyGson = ugly.create();
-        this.prettyGson = pretty.create();
+        this.gson = gson;
+        this.synced = SyncedConfig.class.isAssignableFrom(clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void set(Object config) {
+        this.config = (T) config;
     }
 
     @Override
@@ -72,9 +65,9 @@ public class ConfigHolderImpl<T> implements ConfigHolder<T> {
         if (config == null) {
             try {
                 if (Files.notExists(path)) {
-                    config = configClass.getDeclaredConstructor().newInstance();
+                    config = clazz.getDeclaredConstructor().newInstance();
                 } else {
-                    config = prettyGson.fromJson(String.join("\n", Files.readAllLines(path)), configClass);
+                    config = gson.fromJson(String.join("\n", Files.readAllLines(path)), clazz);
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Failed to get config " + path, e);
@@ -92,25 +85,10 @@ public class ConfigHolderImpl<T> implements ConfigHolder<T> {
     @Override
     public void save() {
         try {
-            Files.write(path, toPrettyJson().getBytes());
+            Files.write(path, gson.toJson(get()).getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public String toJson() {
-        return uglyGson.toJson(get());
-    }
-
-    @Override
-    public String toPrettyJson() {
-        return prettyGson.toJson(get());
-    }
-
-    @Override
-    public void fromJson(String json) {
-        config = prettyGson.fromJson(json, configClass);
     }
 
 }

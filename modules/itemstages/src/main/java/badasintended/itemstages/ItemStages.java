@@ -7,6 +7,7 @@ import badasintended.stages.api.config.ConfigHolder;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
 import badasintended.stages.api.init.StagesInit;
+import com.google.gson.GsonBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -28,10 +29,13 @@ public class ItemStages implements StagesInit {
 
     public static final Item UNKNOWN_ITEM = new Item(new Item.Settings());
 
-    public static final ConfigHolder<ItemStagesConfig> CONFIG = ConfigHolder.create(
-        ItemStagesConfig.class, "item", true, gson -> gson
-            .registerTypeAdapter(Identifier.class, new ItemStagesConfig.IdentifierAdapter())
+    public static final ConfigHolder<ItemStagesConfig> CONFIG = ConfigHolder.of(
+        ItemStagesConfig.class, "item", new GsonBuilder()
             .registerTypeAdapter(ItemStagesConfig.Entry.class, new ItemStagesConfig.Entry.Adapter())
+            .registerTypeAdapter(Identifier.class, new ItemStagesConfig.IdentifierAdapter())
+            .enableComplexMapKeySerialization()
+            .setPrettyPrinting()
+            .create()
     );
 
     public static final CompoundTag EMPTY_TAG = new CompoundTag();

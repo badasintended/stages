@@ -1,7 +1,6 @@
 package badasintended.stages.impl;
 
-import java.nio.charset.StandardCharsets;
-
+import badasintended.stages.api.config.SyncedConfig;
 import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.init.ClientStagesInit;
@@ -33,12 +32,16 @@ public class StagesModClient implements ClientModInitializer {
     public void onInitializeClient() {
         registerS2C(SYNC_CONFIG, (client, handler, buf, sender) -> {
             String name = buf.readString();
-            String json = new String(buf.readByteArray(), StandardCharsets.UTF_8);
-
-            client.execute(() -> {
-                ConfigHolderImpl.CONFIGS.get(name).fromJson(json);
-                LOGGER.info("[stages] Synced config \"{}\"", name);
-            });
+            try {
+                SyncedConfig config = (SyncedConfig) Class.forName(buf.readString()).getDeclaredConstructor().newInstance();
+                config.fromBuf(buf);
+                client.execute(() -> {
+                    ((ConfigHolderImpl<?>) ConfigHolderImpl.CONFIGS.get(name)).set(config);
+                    LOGGER.info("[stages] Synced config \"{}\"", name);
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         registerS2C(BEGIN_SYNC_REGISTRY, (client, handler, buf, sender) ->
