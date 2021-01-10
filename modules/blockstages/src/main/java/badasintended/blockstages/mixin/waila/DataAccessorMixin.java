@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Pseudo
 @Mixin(DataAccessor.class)
+@SuppressWarnings("UnresolvedMixinReference")
 public abstract class DataAccessorMixin {
 
     @Shadow
@@ -25,10 +26,10 @@ public abstract class DataAccessorMixin {
     @Shadow
     public Block block;
 
+    // loom doesn't seem to remap mod method descriptions so it needs intermediary name, great
     @Inject(
-        method = "set(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/hit/HitResult;Lnet/minecraft/entity/Entity;D)V",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getBlockEntity(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/entity/BlockEntity;"),
-        remap = false
+        method = "set(Lnet/minecraft/class_1937;Lnet/minecraft/class_1657;Lnet/minecraft/class_239;Lnet/minecraft/class_1297;D)V",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getBlockEntity(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/entity/BlockEntity;")
     )
     private void replaceBlockState(World world, PlayerEntity player, HitResult hit, Entity viewEntity, double partialTicks, CallbackInfo ci) {
         state = BlockStages.getFakeBlockState(player, state);

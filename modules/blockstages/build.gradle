@@ -5,5 +5,5 @@ repositories {
 moduleDep(project, "stages")
 
 dependencies {
-    modImplementation("mcp.mobius.waila:Hwyla:${hwyla}") { transitive = false }
+    modCompileOnly("mcp.mobius.waila:Hwyla:${hwyla}") { transitive = false }
 }
