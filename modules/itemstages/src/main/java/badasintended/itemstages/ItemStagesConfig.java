@@ -198,12 +198,13 @@ public class ItemStagesConfig implements SyncedConfig {
 
         @Override
         public Identifier read(JsonReader in) throws IOException {
-            return new Identifier("item", in.nextString());
+            String[] id = in.nextString().split(":");
+            return id.length == 1 ? new Identifier("item", id[0]) : new Identifier(id[0], id[1]);
         }
 
         @Override
         public void write(JsonWriter out, Identifier value) throws IOException {
-            out.value(value.getPath());
+            out.value(value.toString());
         }
 
     }

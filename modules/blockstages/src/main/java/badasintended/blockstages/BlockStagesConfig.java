@@ -117,12 +117,13 @@ public class BlockStagesConfig implements SyncedConfig {
 
         @Override
         public Identifier read(JsonReader in) throws IOException {
-            return new Identifier("block", in.nextString());
+            String[] id = in.nextString().split(":");
+            return id.length == 1 ? new Identifier("block", id[0]) : new Identifier(id[0], id[1]);
         }
 
         @Override
         public void write(JsonWriter out, Identifier value) throws IOException {
-            out.value(value.getPath());
+            out.value(value.toString());
         }
 
     }

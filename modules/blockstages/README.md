@@ -10,7 +10,7 @@
       "target": "minecraft:diamond_ore", // target block that will be replaced
       "as"    : "minecraft:stone"        // the replacement block
     },
-    "other_stage": {
+    "namespace:other_stage": {
       "target": "#minecraft:logs",       // also accepts block tag with '#' prefix
       "as"    : "minecraft:dirt"
     } 
