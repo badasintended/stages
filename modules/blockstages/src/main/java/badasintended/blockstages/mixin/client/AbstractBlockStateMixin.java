@@ -2,6 +2,7 @@ package badasintended.blockstages.mixin.client;
 
 import badasintended.blockstages.BlockStages;
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.sound.BlockSoundGroup;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +19,15 @@ public abstract class AbstractBlockStateMixin {
         BlockState fake = BlockStages.getFakeBlockState(self);
         if (fake != self) {
             cir.setReturnValue(fake.getSoundGroup());
+        }
+    }
+
+    @Inject(method = "getRenderType", at = @At("RETURN"), cancellable = true)
+    private void getRenderType(CallbackInfoReturnable<BlockRenderType> cir) {
+        BlockState self = (BlockState) (Object) this;
+        BlockState fake = BlockStages.getFakeBlockState(self);
+        if (fake != self) {
+            cir.setReturnValue(fake.getRenderType());
         }
     }
 

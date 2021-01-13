@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_8",
   "mixins"            : [
     "AbstractBlockStateMixin",
+    "EntityShapeContextMixin",
     "PlayerEntityMixin",
     "ServerPlayerInteractionManagerMixin"
   ],
@@ -14,6 +15,7 @@
     "client.ChunkRendererRegionMixin",
     "client.DebugHudMixin",
     "client.MinecraftClientMixin",
+    "client.WorldRendererMixin",
     "waila.DataAccessorMixin",
     "waila.RayTracingMixin"
   ],
