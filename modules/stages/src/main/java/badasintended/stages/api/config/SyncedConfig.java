@@ -13,7 +13,7 @@ public interface SyncedConfig {
     void toBuf(PacketByteBuf buf);
 
     /**
-     * Read config data to buffer. Used in S2C sync.
+     * Read config data from buffer. Used in S2C sync.
      */
     void fromBuf(PacketByteBuf buf);
 
