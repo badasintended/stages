@@ -87,7 +87,6 @@ public class ItemStagesConfig implements SyncedConfig {
         public Item item = Items.AIR;
         public Tag.Identified<Item> tag = null;
         public CompoundTag nbt = ItemStages.EMPTY_TAG;
-        public String name = "";
 
         @Override
         public void toBuf(PacketByteBuf buf) {
@@ -97,7 +96,6 @@ public class ItemStagesConfig implements SyncedConfig {
                 buf.writeIdentifier(tag.getId());
             }
             buf.writeCompoundTag(nbt);
-            buf.writeByteArray(name.getBytes());
         }
 
         @Override
@@ -109,7 +107,6 @@ public class ItemStagesConfig implements SyncedConfig {
                 tag = null;
             }
             nbt = buf.readCompoundTag();
-            name = new String(buf.readByteArray());
         }
 
         public static class Adapter extends TypeAdapter<Entry> {
@@ -119,7 +116,6 @@ public class ItemStagesConfig implements SyncedConfig {
                 Item item = Items.AIR;
                 Tag.Identified<Item> tag = null;
                 CompoundTag nbt = ItemStages.EMPTY_TAG;
-                String name = "";
 
                 String id = "";
                 if (in.peek() == JsonToken.STRING) {
@@ -138,9 +134,6 @@ public class ItemStagesConfig implements SyncedConfig {
                                 } catch (CommandSyntaxException e) {
                                     throw new IOException(e);
                                 }
-                                break;
-                            case "name":
-                                name = in.nextString();
                                 break;
                         }
                     }
@@ -161,14 +154,13 @@ public class ItemStagesConfig implements SyncedConfig {
                 entry.item = item;
                 entry.tag = tag;
                 entry.nbt = nbt;
-                entry.name = name;
 
                 return entry;
             }
 
             @Override
             public void write(JsonWriter out, Entry value) throws IOException {
-                if (value.name.isEmpty() && value.nbt.isEmpty()) {
+                if (value.nbt.isEmpty()) {
                     out.value(value.tag == null ? Registry.ITEM.getId(value.item).toString() : "#" + value.tag.getId().toString());
                 } else {
                     out.beginObject();
@@ -181,10 +173,6 @@ public class ItemStagesConfig implements SyncedConfig {
                     if (!value.nbt.isEmpty()) {
                         out.name("nbt");
                         out.value(value.nbt.toString());
-                    }
-                    if (!value.name.isEmpty()) {
-                        out.name("name");
-                        out.value(value.name);
                     }
                     out.endObject();
                 }
