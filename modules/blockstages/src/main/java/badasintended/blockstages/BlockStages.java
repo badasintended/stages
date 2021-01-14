@@ -18,7 +18,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
-import static badasintended.stages.api.StagesUtil.id;
+import static badasintended.stages.api.StagesUtil.hasKubeJS;
 import static badasintended.stages.api.StagesUtil.s2c;
 
 public class BlockStages implements StagesInit {
@@ -33,6 +33,11 @@ public class BlockStages implements StagesInit {
             .setPrettyPrinting()
             .create()
     );
+
+    public static Identifier id(String string) {
+        String[] id = string.split(":");
+        return id.length == 1 ? new Identifier("block", id[0]) : new Identifier(id[0], id[1]);
+    }
 
     public static BlockState getFakeBlockState(@Nullable PlayerEntity player, BlockState state) {
         if (player != null && !player.isCreative()) {
@@ -87,9 +92,12 @@ public class BlockStages implements StagesInit {
 
     @Override
     public void onStagesInit() {
-        StageEvents.REGISTRY.register(registry ->
-            registry.register(CONFIG.get().entries.keySet())
-        );
+        StageEvents.REGISTRY.register(registry -> {
+            if (hasKubeJS()) {
+                BlockStagesConfigJS.fire();
+            }
+            registry.register(CONFIG.get().entries.keySet());
+        });
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             init(handler.player);

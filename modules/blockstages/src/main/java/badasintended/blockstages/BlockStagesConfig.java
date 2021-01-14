@@ -117,8 +117,7 @@ public class BlockStagesConfig implements SyncedConfig {
 
         @Override
         public Identifier read(JsonReader in) throws IOException {
-            String[] id = in.nextString().split(":");
-            return id.length == 1 ? new Identifier("block", id[0]) : new Identifier(id[0], id[1]);
+            return BlockStages.id(in.nextString());
         }
 
         @Override
