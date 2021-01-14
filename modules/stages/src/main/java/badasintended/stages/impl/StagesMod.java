@@ -19,7 +19,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.object.builder.v1.advancement.CriterionRegistry;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
@@ -80,7 +79,7 @@ public class StagesMod implements ModInitializer {
         ServerLifecycleEvents.START_DATA_PACK_RELOAD.register((server, serverResourceManager) -> {
             reload();
             server.getPlayerManager().getPlayerList().forEach(StagesMod::sync);
-            StageEvents.REGISTRY_RELOADED.invoker().onRegistryReloaded((MinecraftServer) (Object) this);
+            StageEvents.REGISTRY_RELOADED.invoker().onRegistryReloaded(server);
             StagesMod.LOGGER.info("[stages] Registry and config resynced");
         });
 
