@@ -1,4 +1,4 @@
-# stages [![1][1]][6]  [![2][2]][4]  [![3][3]][5] <img src="src/main/resources/assets/needle/icon.png" align="right"/>
+# stages [![1][1]][6]  [![2][2]][4]  [![3][3]][5] <img src="modules/stages/src/main/resources/assets/stages/icon.png" align="right"/>
 
 [![Fabric API](https://images2.imgbox.com/8e/38/bfInI5qv_o.png)][8]
 
