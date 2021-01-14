@@ -7,6 +7,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -40,6 +41,10 @@ public final class StagesUtil {
     @Environment(EnvType.CLIENT)
     public static void registerS2C(Identifier id, ClientPlayNetworking.PlayChannelHandler handler) {
         ClientPlayNetworking.registerGlobalReceiver(id, handler);
+    }
+
+    public static boolean hasKubeJS() {
+        return FabricLoader.getInstance().isModLoaded("kubejs");
     }
 
 }

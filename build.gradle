@@ -31,12 +31,25 @@ project(":modules").subprojects {
 
     def binDir = "../../bin/jar/${name}"
 
-    dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.minecraft}"
-        mappings "net.fabricmc:yarn:${rootProject.yarn}:v2"
-        modImplementation "net.fabricmc:fabric-loader:${rootProject.loader}"
+    repositories {
+        maven {
+            url "https://www.cursemaven.com"
+            content {
+                includeGroup "curse.maven"
+            }
+        }
+    }
 
-        modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric}"
+    dependencies {
+        minecraft "com.mojang:minecraft:${minecraft}"
+        mappings "net.fabricmc:yarn:${yarn}:v2"
+        modImplementation "net.fabricmc:fabric-loader:${loader}"
+
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric}"
+
+        modImplementation "curse.maven:architectury-419697:${architectury}"
+        modImplementation "curse.maven:rhino-416294:${rhino}"
+        modApi "curse.maven:kubejs-395864:${kubejs}"
     }
 
     task sourcesJar(type: Jar, dependsOn: classes) {

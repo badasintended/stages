@@ -3,6 +3,7 @@ package badasintended.stages.impl;
 import java.util.Set;
 
 import badasintended.stages.api.StagesUtil;
+import badasintended.stages.api.config.ConfigHolder;
 import badasintended.stages.api.config.SyncedConfig;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
@@ -11,16 +12,20 @@ import badasintended.stages.impl.advancement.criterion.StagesChangedCriterion;
 import badasintended.stages.impl.command.StageCommands;
 import badasintended.stages.impl.config.ConfigHolderImpl;
 import badasintended.stages.impl.data.StageRegistryImpl;
+import badasintended.stages.impl.kube.StagesKubeJS;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.object.builder.v1.advancement.CriterionRegistry;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static badasintended.stages.api.StagesUtil.hasKubeJS;
 import static badasintended.stages.api.StagesUtil.s2c;
 
 public class StagesMod implements ModInitializer {
@@ -57,6 +62,13 @@ public class StagesMod implements ModInitializer {
         values.forEach(stages::add);
     }
 
+    private static void reload() {
+        ConfigHolderImpl.CONFIGS.values().forEach(ConfigHolder::destroy);
+        StageRegistryImpl.destroy();
+        StageEvents.REGISTRY.invoker().onRegister(StageRegistryImpl.get());
+        StagesMod.LOGGER.info("[stages] Config destroyed and registry reloaded");
+    }
+
     @Override
     public void onInitialize() {
         StageCommands.register();
@@ -64,9 +76,21 @@ public class StagesMod implements ModInitializer {
 
         StageEvents.CHANGED.register(CRITERION::trigger);
 
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> reload());
+        ServerLifecycleEvents.START_DATA_PACK_RELOAD.register((server, serverResourceManager) -> {
+            reload();
+            server.getPlayerManager().getPlayerList().forEach(StagesMod::sync);
+            StageEvents.REGISTRY_RELOADED.invoker().onRegistryReloaded((MinecraftServer) (Object) this);
+            StagesMod.LOGGER.info("[stages] Registry and config resynced");
+        });
+
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
             sync(handler.player)
         );
+
+        if (hasKubeJS()) {
+            StagesKubeJS.init();
+        }
 
         LOGGER.info("[stages] Loading StagesInit");
         FabricLoader.getInstance().getEntrypointContainers(StagesUtil.MOD_ID + ":main", StagesInit.class).forEach(container -> {

@@ -2,12 +2,10 @@ package badasintended.stages.impl.predicate;
 
 import java.util.Set;
 
-import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSets;
 import net.minecraft.entity.player.PlayerEntity;
@@ -40,9 +38,11 @@ public class StagePredicate {
             JsonObject jsonStages = JsonHelper.asObject(json, "stages");
             jsonStages.entrySet().forEach(entry -> {
                 Identifier stage = new Identifier(entry.getKey());
+                /*
                 if (!StageRegistry.isRegistered(stage)) {
                     throw new JsonParseException("Unregistered stage " + stage);
                 }
+                 */
                 if (JsonHelper.asBoolean(entry.getValue(), "stage")) {
                     must.add(stage);
                 } else {

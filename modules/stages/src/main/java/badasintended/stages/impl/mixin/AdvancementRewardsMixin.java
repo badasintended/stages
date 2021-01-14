@@ -2,13 +2,11 @@ package badasintended.stages.impl.mixin;
 
 import java.util.Set;
 
-import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.impl.advancement.StageAdvancementRewardHolder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -40,9 +38,11 @@ public abstract class AdvancementRewardsMixin implements StageAdvancementRewardH
             Set<Identifier> stageRewards = ((StageAdvancementRewardHolder) cir.getReturnValue()).stages$getReward();
             for (int i = 0; i < array.size(); i++) {
                 Identifier stage = new Identifier(JsonHelper.asString(array.get(i), "stages[" + i + ']'));
+                /*
                 if (!StageRegistry.isRegistered(stage)) {
                     throw new JsonParseException("Unregistered stage " + stage);
                 }
+                 */
                 stageRewards.add(stage);
             }
         }

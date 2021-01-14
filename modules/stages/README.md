@@ -58,3 +58,19 @@
   }
 }
 ```
+
+
+## KubeJS
+
+### `stages.changed` Event
+Fired after player stage is changed.
+
+```js
+onEvent("stages.changed", event => {
+    var player = event.getPlayer();   // get stage owner
+    var stages = event.getStages();   // get list containing all unlocked stages
+    for (i in stages) {
+        console.info(stages[i]);
+    }
+});
+```
