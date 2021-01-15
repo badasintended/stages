@@ -1,5 +1,7 @@
 package badasintended.stages.api.config;
 
+import java.util.function.Consumer;
+
 import badasintended.stages.impl.config.ConfigHolderImpl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,23 +23,10 @@ public interface ConfigHolder<T> {
      * Create new config holder with default gson.
      *
      * @param clazz must have a constructor with empty parameter.
-     *              <b>implement {@link SyncedConfig} to make it synced to client</b>
      * @param name  config json can be located on {@code .minecraft/config/stages/<name>.json}
      */
-    static <T> ConfigHolder<T> of(Class<T> clazz, String name) {
-        return of(clazz, name, GSON);
-    }
-
-    /**
-     * Create new config holder with custom gson.
-     *
-     * @param clazz must have a constructor with empty parameter.
-     *              <b>implement {@link SyncedConfig} to make it synced to client</b>
-     * @param name  config json can be located on {@code .minecraft/config/stages/<name>.json}
-     * @param gson  custom gson that will be used for (de)serializing
-     */
-    static <T> ConfigHolder<T> of(Class<T> clazz, String name, Gson gson) {
-        return ConfigHolderImpl.create(clazz, name, gson);
+    static <T> Builder<T> of(Class<T> clazz, String name) {
+        return new ConfigHolderImpl.Builder<>(clazz, name);
     }
 
 
@@ -61,5 +50,30 @@ public interface ConfigHolder<T> {
      * Try to save config to json file.
      */
     void save();
+
+
+    interface Builder<T> {
+
+        /**
+         * Make this config synced to client.<br>
+         * <b>Config class must implements {@link SyncedConfig}!</b>
+         *
+         * @throws UnsupportedOperationException if class does not implement {@link SyncedConfig}
+         */
+        Builder<T> synced();
+
+        /**
+         * Use custom GSON for (de)serializing.
+         */
+        Builder<T> gson(Gson gson);
+
+        Builder<T> transformer(Consumer<T> consumer);
+
+        /**
+         * Build the config holder.
+         */
+        ConfigHolder<T> build();
+
+    }
 
 }

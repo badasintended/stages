@@ -5,8 +5,11 @@
   "compatibilityLevel": "JAVA_8",
   "mixins"            : [
     "AbstractBlockStateMixin",
+    "EntityMixin",
     "EntityShapeContextMixin",
+    "LivingEntityMixin",
     "PlayerEntityMixin",
+    "ServerPlayerEntityMixin",
     "ServerPlayerInteractionManagerMixin"
   ],
   "client"            : [

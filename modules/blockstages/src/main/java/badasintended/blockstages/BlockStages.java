@@ -25,14 +25,21 @@ public class BlockStages implements StagesInit {
 
     public static final Identifier INITIALIZE = id("block/init");
 
-    public static final ConfigHolder<BlockStagesConfig> CONFIG = ConfigHolder.of(
-        BlockStagesConfig.class, "block", new GsonBuilder()
+    public static final ConfigHolder<BlockStagesConfig> CONFIG = ConfigHolder
+        .of(BlockStagesConfig.class, "block")
+        .synced()
+        .gson(new GsonBuilder()
             .registerTypeAdapter(BlockStagesConfig.Entry.class, new BlockStagesConfig.Entry.Adapter())
             .registerTypeAdapter(Identifier.class, new BlockStagesConfig.IdentifierAdapter())
             .enableComplexMapKeySerialization()
             .setPrettyPrinting()
-            .create()
-    );
+            .create())
+        .transformer(config -> {
+            if (hasKubeJS()) {
+                BlockStagesConfigJS.fire(config);
+            }
+        })
+        .build();
 
     public static Identifier id(String string) {
         String[] id = string.split(":");
@@ -92,12 +99,9 @@ public class BlockStages implements StagesInit {
 
     @Override
     public void onStagesInit() {
-        StageEvents.REGISTRY.register(registry -> {
-            if (hasKubeJS()) {
-                BlockStagesConfigJS.fire();
-            }
-            registry.register(CONFIG.get().entries.keySet());
-        });
+        StageEvents.REGISTRY.register(registry ->
+            registry.register(CONFIG.get().entries.keySet())
+        );
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             init(handler.player);

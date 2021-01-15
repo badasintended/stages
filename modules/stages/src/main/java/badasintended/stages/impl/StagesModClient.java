@@ -36,7 +36,7 @@ public class StagesModClient implements ClientModInitializer {
                 SyncedConfig config = (SyncedConfig) Class.forName(buf.readString()).getDeclaredConstructor().newInstance();
                 config.fromBuf(buf);
                 client.execute(() -> {
-                    ((ConfigHolderImpl<?>) ConfigHolderImpl.CONFIGS.get(name)).set(config);
+                    ConfigHolderImpl.CONFIGS.get(name).set(config);
                     LOGGER.info("[stages] Synced config \"{}\"", name);
                 });
             } catch (Exception e) {

@@ -1,6 +1,5 @@
 package badasintended.itemstages;
 
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -125,7 +124,7 @@ public class ItemStagesConfig implements SyncedConfig {
                     while (in.hasNext() && in.peek() != JsonToken.END_OBJECT) {
                         String propName = in.nextName();
                         switch (propName) {
-                            case "id":
+                            case "target":
                                 id = in.nextString();
                                 break;
                             case "nbt":
@@ -164,7 +163,7 @@ public class ItemStagesConfig implements SyncedConfig {
                     out.value(value.tag == null ? Registry.ITEM.getId(value.item).toString() : "#" + value.tag.getId().toString());
                 } else {
                     out.beginObject();
-                    out.name("id");
+                    out.name("target");
                     if (value.tag != null) {
                         out.value("#" + value.tag.getId().toString());
                     } else {
@@ -186,8 +185,7 @@ public class ItemStagesConfig implements SyncedConfig {
 
         @Override
         public Identifier read(JsonReader in) throws IOException {
-            String[] id = in.nextString().split(":");
-            return id.length == 1 ? new Identifier("item", id[0]) : new Identifier(id[0], id[1]);
+            return ItemStages.id(in.nextString());
         }
 
         @Override

@@ -12,14 +12,14 @@ public class BlockStagesConfigJS extends EventJS {
 
     public static final String EVENT = "blockstages";
 
-    public static void fire() {
-        new BlockStagesConfigJS().post(ScriptType.SERVER, EVENT);
+    public static void fire(BlockStagesConfig config) {
+        new BlockStagesConfigJS(config).post(ScriptType.SERVER, EVENT);
     }
 
     private final BlockStagesConfig config;
 
-    public BlockStagesConfigJS() {
-        this.config = BlockStages.CONFIG.get();
+    public BlockStagesConfigJS(BlockStagesConfig config) {
+        this.config = config;
     }
 
     public void add(String id, String target, String as) {

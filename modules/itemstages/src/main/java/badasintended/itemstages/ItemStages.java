@@ -3,6 +3,7 @@ package badasintended.itemstages;
 import java.util.Map;
 import java.util.Set;
 
+import badasintended.stages.api.StagesUtil;
 import badasintended.stages.api.config.ConfigHolder;
 import badasintended.stages.api.data.Stages;
 import badasintended.stages.api.event.StageEvents;
@@ -22,25 +23,37 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 
-import static badasintended.stages.api.StagesUtil.id;
+import static badasintended.stages.api.StagesUtil.hasKubeJS;
 import static badasintended.stages.api.StagesUtil.s2c;
 
 public class ItemStages implements StagesInit {
 
     public static final Item UNKNOWN_ITEM = new Item(new Item.Settings());
 
-    public static final ConfigHolder<ItemStagesConfig> CONFIG = ConfigHolder.of(
-        ItemStagesConfig.class, "item", new GsonBuilder()
+    public static final ConfigHolder<ItemStagesConfig> CONFIG = ConfigHolder
+        .of(ItemStagesConfig.class, "item")
+        .synced()
+        .gson(new GsonBuilder()
             .registerTypeAdapter(ItemStagesConfig.Entry.class, new ItemStagesConfig.Entry.Adapter())
             .registerTypeAdapter(Identifier.class, new ItemStagesConfig.IdentifierAdapter())
             .enableComplexMapKeySerialization()
             .setPrettyPrinting()
-            .create()
-    );
+            .create())
+        .transformer(config -> {
+            if (hasKubeJS()) {
+                ItemStagesConfigJS.fire(config);
+            }
+        })
+        .build();
 
     public static final CompoundTag EMPTY_TAG = new CompoundTag();
 
-    public static final Identifier INITIALIZE = id("item/init");
+    public static final Identifier INITIALIZE = StagesUtil.id("item/init");
+
+    public static Identifier id(String string) {
+        String[] id = string.split(":");
+        return id.length == 1 ? new Identifier("item", id[0]) : new Identifier(id[0], id[1]);
+    }
 
     @Environment(EnvType.CLIENT)
     public static boolean isLocked(ItemStack stack) {
