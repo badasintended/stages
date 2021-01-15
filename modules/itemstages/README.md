@@ -37,7 +37,7 @@ Settings decide how staged items effect player ability
 ### KubeJS
 `.minecraft/kubejs/server_scripts/<script_name>.js`
 ```js
-onEvent("blockstages", event => {
+onEvent("itemstages", event => {
     event.settings({
         option: true,
         other: false
