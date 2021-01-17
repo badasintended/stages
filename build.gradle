@@ -19,7 +19,7 @@ def moduleDep(Project project, String... deps) {
     }
 }
 
-project(":modules").subprojects {
+allprojects {
     apply plugin: "fabric-loom"
     apply plugin: "com.github.fudge.forgedflowerloom"
     apply plugin: "maven-publish"
