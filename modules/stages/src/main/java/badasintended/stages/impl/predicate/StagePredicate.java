@@ -38,11 +38,6 @@ public class StagePredicate {
             JsonObject jsonStages = JsonHelper.asObject(json, "stages");
             jsonStages.entrySet().forEach(entry -> {
                 Identifier stage = new Identifier(entry.getKey());
-                /*
-                if (!StageRegistry.isRegistered(stage)) {
-                    throw new JsonParseException("Unregistered stage " + stage);
-                }
-                 */
                 if (JsonHelper.asBoolean(entry.getValue(), "stage")) {
                     must.add(stage);
                 } else {

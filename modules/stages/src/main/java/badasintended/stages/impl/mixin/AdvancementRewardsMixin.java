@@ -38,11 +38,6 @@ public abstract class AdvancementRewardsMixin implements StageAdvancementRewardH
             Set<Identifier> stageRewards = ((StageAdvancementRewardHolder) cir.getReturnValue()).stages$getReward();
             for (int i = 0; i < array.size(); i++) {
                 Identifier stage = new Identifier(JsonHelper.asString(array.get(i), "stages[" + i + ']'));
-                /*
-                if (!StageRegistry.isRegistered(stage)) {
-                    throw new JsonParseException("Unregistered stage " + stage);
-                }
-                 */
                 stageRewards.add(stage);
             }
         }

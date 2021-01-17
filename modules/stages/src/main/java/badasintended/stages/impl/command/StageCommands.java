@@ -13,6 +13,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
@@ -32,6 +33,9 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class StageCommands {
+
+    public static final SimpleCommandExceptionType
+        UNREGISTERED_STAGE = new SimpleCommandExceptionType(new TranslatableText("argument.stages.unregistered"));
 
     // @formatter:off
     private static final ArgumentType<?>
@@ -108,6 +112,9 @@ public class StageCommands {
 
     private static int edit(CommandContext<ServerCommandSource> context, boolean silent, boolean add) throws CommandSyntaxException {
         Identifier stage = StageArgumentType.getIdentifier(context, "stage");
+        if (!StageRegistry.isRegistered(stage)) {
+            throw UNREGISTERED_STAGE.create();
+        }
         ServerCommandSource source = context.getSource();
         PlayerEntity sender = source.getPlayer();
         for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
@@ -187,10 +194,14 @@ public class StageCommands {
         return 0;
     }
 
-    private static void check(CommandContext<ServerCommandSource> context, ServerPlayerEntity player) {
+    private static void check(CommandContext<ServerCommandSource> context, ServerPlayerEntity player) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
 
         Identifier stage = StageArgumentType.getIdentifier(context, "stage");
+        if (!StageRegistry.isRegistered(stage)) {
+            throw UNREGISTERED_STAGE.create();
+        }
+
         boolean contains = Stages.get(player).contains(stage);
         source.sendFeedback(new TranslatableText("command.stages.check." + contains, player.getDisplayName(), stage), true);
     }

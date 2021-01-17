@@ -7,7 +7,6 @@
     "AdvancementRewardsMixin",
     "EntitySelectorOptionsMixin",
     "EntitySelectorReaderMixin",
-    "MinecraftServerMixin",
     "PlayerEntityMixin",
     "PlayerPredicateMixin"
   ],

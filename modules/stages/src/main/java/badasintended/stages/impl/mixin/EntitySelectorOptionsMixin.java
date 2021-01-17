@@ -5,9 +5,9 @@ import java.util.function.Predicate;
 
 import badasintended.stages.api.data.StageRegistry;
 import badasintended.stages.api.data.Stages;
+import badasintended.stages.impl.command.StageCommands;
 import badasintended.stages.impl.command.StageSelectorHolder;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.command.EntitySelectorOptions;
 import net.minecraft.command.EntitySelectorReader;
@@ -17,17 +17,12 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntitySelectorOptions.class)
 public abstract class EntitySelectorOptionsMixin {
-
-    @Unique
-    private static final SimpleCommandExceptionType
-        UNREGISTERED_STAGE = new SimpleCommandExceptionType(new TranslatableText("argument.stages.unregistered"));
 
     @Shadow
     private static void putOption(String id, EntitySelectorOptions.SelectorHandler handler, Predicate<EntitySelectorReader> condition, Text description) {
@@ -55,7 +50,7 @@ public abstract class EntitySelectorOptionsMixin {
 
                     Identifier stageId = Identifier.fromCommandInput(string);
                     if (!StageRegistry.isRegistered(stageId)) {
-                        throw UNREGISTERED_STAGE.createWithContext(string);
+                        throw StageCommands.UNREGISTERED_STAGE.createWithContext(string);
                     }
 
                     if (not) {

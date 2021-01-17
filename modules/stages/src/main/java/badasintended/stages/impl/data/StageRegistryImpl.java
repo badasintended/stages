@@ -28,19 +28,8 @@ public class StageRegistryImpl implements StageRegistry {
         instance = null;
     }
 
-    private final Int2ObjectOpenHashMap<Identifier> i2o = new Int2ObjectOpenHashMap<>();
-    private final Object2IntOpenHashMap<Identifier> o2i = new Object2IntOpenHashMap<>();
-
-    private int lastIntKey = 0;
-
-    @Override
-    public void register(Identifier stage) {
-        if (o2i.containsKey(stage)) {
-            i2o.remove(o2i.getInt(stage));
-        }
-        i2o.put(lastIntKey, stage);
-        o2i.put(stage, lastIntKey);
-        lastIntKey++;
+    public static void lock() {
+        get().locked = true;
     }
 
     public static boolean isRegistered(Identifier stage) {
@@ -72,6 +61,26 @@ public class StageRegistryImpl implements StageRegistry {
     public static void syncRegistry(int i, Identifier stage) {
         get().i2o.put(i, stage);
         get().o2i.put(stage, i);
+    }
+
+
+    private final Int2ObjectOpenHashMap<Identifier> i2o = new Int2ObjectOpenHashMap<>();
+    private final Object2IntOpenHashMap<Identifier> o2i = new Object2IntOpenHashMap<>();
+
+    private int lastIntKey = 0;
+    private boolean locked = false;
+
+    @Override
+    public void register(Identifier stage) {
+        if (locked) {
+            throw new IllegalStateException("Tried to touch registry impl and failed");
+        }
+        if (o2i.containsKey(stage)) {
+            i2o.remove(o2i.getInt(stage));
+        }
+        i2o.put(lastIntKey, stage);
+        o2i.put(stage, lastIntKey);
+        lastIntKey++;
     }
 
 }

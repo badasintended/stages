@@ -65,6 +65,7 @@ public class StagesMod implements ModInitializer {
         ConfigHolderImpl.CONFIGS.values().forEach(ConfigHolder::destroy);
         StageRegistryImpl.destroy();
         StageEvents.REGISTRY.invoker().onRegister(StageRegistryImpl.get());
+        StageRegistryImpl.lock();
         StagesMod.LOGGER.info("[stages] Config destroyed and registry reloaded");
     }
 
