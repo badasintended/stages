@@ -7,11 +7,11 @@ import badasintended.stages.api.init.ClientStagesInit;
 import badasintended.stages.impl.config.ConfigHolderImpl;
 import badasintended.stages.impl.data.StageRegistryImpl;
 import badasintended.stages.impl.data.StagesImpl;
+import it.unimi.dsi.fastutil.ints.Int2BooleanOpenHashMap;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
 import static badasintended.stages.api.StagesUtil.MOD_ID;
@@ -21,12 +21,12 @@ import static badasintended.stages.impl.StagesMod.END_SYNC_REGISTRY;
 import static badasintended.stages.impl.StagesMod.LOGGER;
 import static badasintended.stages.impl.StagesMod.SYNC_CONFIG;
 import static badasintended.stages.impl.StagesMod.SYNC_REGISTRY;
-import static badasintended.stages.impl.StagesMod.SYNC_STAGE_ADDED;
-import static badasintended.stages.impl.StagesMod.SYNC_STAGE_CHANGED;
-import static badasintended.stages.impl.StagesMod.SYNC_STAGE_REMOVED;
+import static badasintended.stages.impl.StagesMod.SYNC_STAGE;
 
 @Environment(EnvType.CLIENT)
 public class StagesModClient implements ClientModInitializer {
+
+    private final Int2BooleanOpenHashMap syncMap = new Int2BooleanOpenHashMap();
 
     @Override
     public void onInitializeClient() {
@@ -59,29 +59,16 @@ public class StagesModClient implements ClientModInitializer {
             client.execute(() -> LOGGER.info("[stages] Registry synced, total {} stages", StageRegistry.allStages().size()))
         );
 
-        registerS2C(SYNC_STAGE_ADDED, (client, handler, buf, sender) -> {
-            int id = buf.readVarInt();
+        registerS2C(SYNC_STAGE, (client, handler, buf, sender) -> {
+            syncMap.clear();
+            while (buf.isReadable()) {
+                syncMap.put(buf.readVarInt(), buf.readBoolean());
+            }
 
-            client.execute(() -> {
-                PlayerEntity player = client.player;
-                StagesImpl data = (StagesImpl) Stages.get(player);
-                data.syncAdd(id);
-            });
+            client.execute(() ->
+                ((StagesImpl) Stages.get(client.player)).sync(syncMap)
+            );
         });
-
-        registerS2C(SYNC_STAGE_REMOVED, (client, handler, buf, sender) -> {
-            int id = buf.readVarInt();
-
-            client.execute(() -> {
-                PlayerEntity player = client.player;
-                StagesImpl data = (StagesImpl) Stages.get(player);
-                data.syncRemove(id);
-            });
-        });
-
-        registerS2C(SYNC_STAGE_CHANGED, (client, handler, buf, sender) ->
-            client.execute(() -> ((StagesImpl) Stages.get(client.player)).syncChanged())
-        );
 
         LOGGER.info("[stages] Loading ClientStagesInit");
         FabricLoader.getInstance().getEntrypointContainers(MOD_ID + ":client", ClientStagesInit.class).forEach(container -> {

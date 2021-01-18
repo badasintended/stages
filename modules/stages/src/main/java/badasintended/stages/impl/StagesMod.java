@@ -37,9 +37,7 @@ public class StagesMod implements ModInitializer {
         BEGIN_SYNC_REGISTRY = StagesUtil.id("begin_sync_registry"),
         SYNC_REGISTRY       = StagesUtil.id("sync_registry"),
         END_SYNC_REGISTRY   = StagesUtil.id("end_sync_registry"),
-        SYNC_STAGE_ADDED    = StagesUtil.id("sync_stage_added"),
-        SYNC_STAGE_REMOVED  = StagesUtil.id("sync_stage_removed"),
-        SYNC_STAGE_CHANGED  = StagesUtil.id("sync_stage_changed"),
+        SYNC_STAGE          = StagesUtil.id("sync_stage"),
         SYNC_CONFIG         = StagesUtil.id("sync_config");
     // @formatter:on
 
