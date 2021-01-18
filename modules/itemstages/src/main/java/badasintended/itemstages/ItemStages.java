@@ -28,7 +28,9 @@ import static badasintended.stages.api.StagesUtil.s2c;
 
 public class ItemStages implements StagesInit {
 
-    public static final Item UNKNOWN_ITEM = new Item(new Item.Settings());
+    public static final String MOD_ID = "itemstages";
+    public static final Item UNKNOWN_ITEM = new UnknownItem();
+    public static final ItemStack UNKNOWN_STACK = new ItemStack(UNKNOWN_ITEM);
 
     public static final ConfigHolder<ItemStagesConfig> CONFIG = ConfigHolder
         .of(ItemStagesConfig.class, "item")

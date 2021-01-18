@@ -10,7 +10,8 @@
   "client"            : [
     "client.ItemModelsMixin",
     "client.ItemStackMixin",
-    "rei.EntryListWidgetMixin"
+    "rei.EntryListWidgetMixin",
+    "rei.ItemEntryStackMixin"
   ],
   "injectors"         : {
     "defaultRequire": 1

@@ -26,9 +26,9 @@ Settings decide how staged items effect player ability
   "entries": {
     "stage_name": "minecraft:diamond",
     "namespace:other": "#minecraft:beds",
-    "with_nbt": { // untested, probably doesn't work :P
+    "with_nbt": {
       "target": "minecraft:enchanted_book",
-      "nbt": "{StoredEnchantments: [{id: 'minecraft:mending', lvl: 1}]}"
+      "nbt": "{StoredEnchantments: [{id: 'minecraft:mending', lvl: 1s}]}"
     }
   }
 }
@@ -46,7 +46,8 @@ onEvent("itemstages", event => {
     event.add("stage_name", "minecraft:diamond");
     event.add("namespace:other", "#minecraft:beds");
     event.add("with_nbt", "minecraft:enchanted_book", {
-        StoredEnchantments: [{id: "minecraft:mending", lvl: 1}]
+        // it needs to be short or it wont work
+        StoredEnchantments: [{id: "minecraft:mending", lvl: new java.lang.Short(1)}]
     });
 
     event.remove("something_else");
